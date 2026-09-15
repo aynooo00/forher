@@ -1,0 +1,6 @@
+{
+  "name": "La Quête des Cinq Plumes",
+  "description": "Escape game mystérieux et poétique sous forme de chasse au trésor littéraire et sensorielle.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
