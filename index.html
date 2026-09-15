@@ -4,13 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>La Quête des Cinq Plumes</title>
-    <meta name="description" content="Escape game mystérieux et poétique sous forme de chasse au trésor littéraire et sensorielle." />
+    <meta name="description" content="Escape game poétique et mystérieux sous forme de chasse au trésor littéraire et sensorielle." />
     <meta property="og:title" content="La Quête des Cinq Plumes" />
-    <meta property="og:description" content="Escape game mystérieux et poétique sous forme de chasse au trésor littéraire et sensorielle." />
+    <meta property="og:description" content="Escape game poétique et mystérieux sous forme de chasse au trésor littéraire et sensorielle." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
 
-    <!-- Google Fonts: Playfair Display & Lora (Serif élégante), Montserrat & Quicksand (Parisian Boutique & Sans-serif épurée) -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -24,26 +24,26 @@
         --font-poetic: 'Lora', Georgia, serif;
         --font-sans: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
         --font-clue: 'Quicksand', sans-serif;
-        
-        /* Palettes par écran */
+
+        /* Couleurs Thèmes */
         --color-creme: #fdfbf7;
-        --color-rose-poudre: #fadadd;
-        --color-boutique-bg: #fce8e8;
-        --color-sauge: #7a8e82;
-        --color-bordeaux: #7a4e55;
-        --color-sable: #dfd3c3;
-        --color-plage: #5e7788;
-        
-        /* Design Boutique de Louise / Jeu 1 */
+        --color-rose-poudre: #f9e8eb;
+        --color-boutique-bg: #fdf1f1;
+        --color-sauge: #eaf1ed;
+        --color-bordeaux: #f3eaec;
+        --color-sable: #f7f1e7;
+        --color-plage: #eef3f6;
+
+        /* Accents Épreuve 1 (Boutique) */
         --coral-primary: #df6868;
         --coral-hover: #cf5555;
         --text-dark: #332624;
         --text-muted: #785a56;
-        --border-soft: #ebd6d6;
-        
-        --wordle-green: #8fc99b;      /* Lettre correcte et bien placée (vert pastel doux) */
-        --wordle-gold: #e5b758;       /* Lettre présente mais mal placée (jaune moutarde/doré) */
-        --wordle-gray: #d5c3c8;       /* Lettre absente (rose-gris neutre) */
+        --border-soft: #e8d5d5;
+
+        --wordle-green: #8fc99b;
+        --wordle-gold: #e5b758;
+        --wordle-gray: #d5c3c8;
         --tile-border: #ebd6d8;
       }
 
@@ -61,10 +61,9 @@
         min-height: 100vh;
         width: 100%;
         overflow-x: hidden;
-        transition: background-color 1s ease, background-image 1s ease, color 0.6s ease;
+        transition: background-color 0.8s ease, color 0.5s ease;
         display: flex;
         flex-direction: column;
-        justify-content: flex-start;
         align-items: center;
         position: relative;
         -webkit-font-smoothing: antialiased;
@@ -81,35 +80,137 @@
         z-index: 0;
       }
 
+      /* Barre supérieure universelle avec statut de sauvegarde et bouton Recommencer */
+      .top-navbar {
+        position: sticky;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-width: 900px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 18px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(220, 205, 200, 0.45);
+        z-index: 50;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+      }
+
+      .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .app-brand {
+        font-family: var(--font-serif);
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        text-decoration: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .save-status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: #5c7b64;
+        background: #eef7f0;
+        border: 1px solid #d4ebd7;
+        padding: 3px 9px;
+        border-radius: 999px;
+        letter-spacing: 0.03em;
+        transition: opacity 0.3s ease;
+      }
+
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .feather-counter-btn {
+        background: #fff6e8;
+        border: 1px solid #f2dfc0;
+        color: #9c6c13;
+        font-size: 0.76rem;
+        font-weight: 700;
+        padding: 5px 12px;
+        border-radius: 999px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.2s ease;
+      }
+
+      .feather-counter-btn:hover {
+        background: #fdecce;
+        transform: translateY(-1px);
+      }
+
+      .btn-restart-app {
+        background: #2b221e;
+        color: #ffffff;
+        border: none;
+        border-radius: 999px;
+        padding: 6px 14px;
+        font-size: 0.76rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-family: var(--font-sans);
+        box-shadow: 0 2px 6px rgba(43, 34, 30, 0.15);
+        transition: all 0.2s ease;
+      }
+
+      .btn-restart-app:hover {
+        background: #463731;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(43, 34, 30, 0.25);
+      }
+
       /* Conteneur principal */
       #app-container {
         width: 100%;
-        min-height: 100vh;
+        max-width: 900px;
+        min-height: calc(100vh - 60px);
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         position: relative;
         z-index: 1;
+        padding: 16px;
       }
 
-      /* Structure commune des écrans */
+      /* Règle essentielle : Tout écran inactif est masqué, TOUT écran actif est visible en flex */
       .screen {
         width: 100%;
-        display: none;
+        display: none !important;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         opacity: 0;
-        transform: translateY(10px);
-        transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-        padding: 24px 16px;
+        transform: translateY(6px);
+        transition: opacity 0.4s ease, transform 0.4s ease;
       }
 
       .screen.active {
-        display: flex;
-        opacity: 1;
-        transform: translateY(0);
+        display: flex !important;
+        opacity: 1 !important;
+        transform: translateY(0) !important;
       }
 
       /* ===================================================
@@ -117,8 +218,7 @@
          =================================================== */
       #ecran-enveloppe {
         text-align: center;
-        min-height: 100vh;
-        justify-content: center;
+        min-height: 75vh;
       }
 
       .envelope-wrapper {
@@ -127,7 +227,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        transition: transform 0.4s ease, opacity 0.6s ease;
+        transition: transform 0.3s ease;
       }
 
       .envelope-wrapper:hover {
@@ -136,8 +236,8 @@
 
       .envelope {
         position: relative;
-        width: 280px;
-        height: 186px;
+        width: 290px;
+        height: 190px;
         background: #f7eedf;
         border-radius: 8px;
         box-shadow: 0 16px 36px rgba(90, 70, 60, 0.12), 0 4px 12px rgba(90, 70, 60, 0.08);
@@ -150,8 +250,8 @@
 
       @media (min-width: 640px) {
         .envelope {
-          width: 320px;
-          height: 210px;
+          width: 330px;
+          height: 215px;
         }
       }
 
@@ -161,9 +261,9 @@
         left: 0;
         width: 0;
         height: 0;
-        border-left: 140px solid transparent;
-        border-right: 140px solid transparent;
-        border-top: 105px solid #ecd8c2;
+        border-left: 145px solid transparent;
+        border-right: 145px solid transparent;
+        border-top: 108px solid #ecd8c2;
         transform-origin: top;
         transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 3;
@@ -172,9 +272,9 @@
 
       @media (min-width: 640px) {
         .envelope-flap {
-          border-left-width: 160px;
-          border-right-width: 160px;
-          border-top-width: 118px;
+          border-left-width: 165px;
+          border-right-width: 165px;
+          border-top-width: 120px;
         }
       }
 
@@ -184,26 +284,26 @@
         left: 0;
         width: 0;
         height: 0;
-        border-left: 140px solid #f2e3cf;
-        border-right: 140px solid #f2e3cf;
-        border-bottom: 95px solid #ebdac6;
+        border-left: 145px solid #f2e3cf;
+        border-right: 145px solid #f2e3cf;
+        border-bottom: 98px solid #ebdac6;
         z-index: 2;
       }
 
       @media (min-width: 640px) {
         .envelope-pocket {
-          border-left-width: 160px;
-          border-right-width: 160px;
-          border-bottom-width: 108px;
+          border-left-width: 165px;
+          border-right-width: 165px;
+          border-bottom-width: 110px;
         }
       }
 
       .wax-seal {
         position: absolute;
-        top: 80px;
+        top: 85px;
         z-index: 4;
-        width: 48px;
-        height: 48px;
+        width: 50px;
+        height: 50px;
         background: radial-gradient(circle at 35% 35%, #e26475, #9e2a3d);
         border-radius: 50%;
         box-shadow: 0 4px 10px rgba(110, 20, 35, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.4);
@@ -216,9 +316,9 @@
 
       @media (min-width: 640px) {
         .wax-seal {
-          top: 92px;
-          width: 52px;
-          height: 52px;
+          top: 96px;
+          width: 54px;
+          height: 54px;
         }
       }
 
@@ -227,25 +327,45 @@
       }
 
       .envelope-caption {
-        margin-top: 28px;
+        margin-top: 24px;
         font-family: var(--font-poetic);
         font-style: italic;
         font-size: 1.05rem;
         color: #6e5e57;
-        letter-spacing: 0.06em;
+        letter-spacing: 0.05em;
         display: flex;
         align-items: center;
         gap: 8px;
-        opacity: 0.9;
       }
 
       .envelope-caption::before,
       .envelope-caption::after {
         content: '';
         display: inline-block;
-        width: 24px;
+        width: 20px;
         height: 1px;
         background: #d8c4b2;
+      }
+
+      .btn-open-direct {
+        margin-top: 14px;
+        padding: 10px 22px;
+        border-radius: 999px;
+        background: #2b221e;
+        color: #ffffff;
+        font-size: 0.82rem;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+      }
+
+      .btn-open-direct:hover {
+        background: #463731;
+        transform: translateY(-1px);
       }
 
       /* ===================================================
@@ -254,28 +374,25 @@
       #ecran-intro {
         text-align: center;
         max-width: 660px;
-        min-height: 100vh;
-        justify-content: center;
       }
 
       .poem-card {
-        background: rgba(255, 255, 255, 0.75);
+        background: rgba(255, 255, 255, 0.88);
         backdrop-filter: blur(8px);
-        padding: 40px 28px;
-        border-radius: 16px;
-        border: 1px solid rgba(220, 205, 190, 0.45);
+        padding: 36px 28px;
+        border-radius: 18px;
+        border: 1px solid rgba(220, 205, 190, 0.5);
         box-shadow: 0 12px 32px rgba(90, 70, 60, 0.06);
+        width: 100%;
       }
 
       .poem-line {
         font-family: var(--font-poetic);
-        font-size: 1.15rem;
+        font-size: 1.12rem;
         line-height: 1.85;
         color: #3e332e;
         margin-bottom: 14px;
-        opacity: 0;
-        transform: translateY(12px);
-        transition: opacity 0.8s ease, transform 0.8s ease;
+        transition: opacity 0.5s ease;
       }
 
       .poem-line:first-child {
@@ -283,28 +400,23 @@
         font-size: 1.45rem;
         font-weight: 600;
         color: #2b221e;
-        margin-bottom: 20px;
+        margin-bottom: 18px;
       }
 
       .poem-line:last-of-type {
         font-style: italic;
-        font-weight: 500;
+        font-weight: 600;
         margin-top: 18px;
         color: #b84a4a;
       }
 
-      .poem-line.visible {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
       .btn-elegant {
-        margin-top: 32px;
+        margin-top: 26px;
         padding: 13px 32px;
         font-family: var(--font-sans);
         font-size: 0.9rem;
         font-weight: 600;
-        letter-spacing: 0.12em;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
         border: none;
         border-radius: 30px;
@@ -312,17 +424,10 @@
         color: #fdfbf7;
         cursor: pointer;
         box-shadow: 0 6px 20px rgba(43, 34, 30, 0.2);
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
         display: inline-flex;
         align-items: center;
         gap: 10px;
-        opacity: 0;
-        transform: translateY(8px);
-      }
-
-      .btn-elegant.visible {
-        opacity: 1;
-        transform: translateY(0);
       }
 
       .btn-elegant:hover {
@@ -336,93 +441,71 @@
          =================================================== */
       #ecran-hub {
         text-align: center;
-        max-width: 760px;
-        min-height: 100vh;
-        justify-content: center;
+        max-width: 780px;
       }
 
       .hub-header {
-        margin-bottom: 30px;
+        margin-bottom: 24px;
       }
 
       .hub-title {
         font-family: var(--font-serif);
-        font-size: 2.2rem;
+        font-size: 2.1rem;
         font-weight: 600;
         color: #3b282c;
-        margin-bottom: 8px;
-        letter-spacing: 0.02em;
+        margin-bottom: 6px;
       }
 
       .hub-subtitle {
         font-family: var(--font-poetic);
         font-style: italic;
-        font-size: 1.05rem;
+        font-size: 1rem;
         color: #735359;
       }
 
       .feathers-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-        gap: 18px;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 16px;
         width: 100%;
         margin-top: 8px;
       }
 
-      @media (min-width: 640px) {
-        .feathers-grid {
-          grid-template-columns: repeat(3, 1fr);
-        }
-        .feathers-grid .feather-slot:nth-child(4) {
-          grid-column: 1 / 2;
-        }
-        .feathers-grid .feather-slot:nth-child(5) {
-          grid-column: 2 / 3;
-        }
-      }
-
       .feather-slot {
-        background: rgba(255, 255, 255, 0.78);
+        background: rgba(255, 255, 255, 0.88);
         backdrop-filter: blur(8px);
         border: 1px solid rgba(220, 185, 195, 0.5);
-        border-radius: 14px;
-        padding: 24px 16px;
+        border-radius: 16px;
+        padding: 22px 16px;
         display: flex;
         flex-direction: column;
         align-items: center;
         text-align: center;
         position: relative;
         cursor: pointer;
-        transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
-        box-shadow: 0 4px 16px rgba(110, 60, 80, 0.04);
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 14px rgba(110, 60, 80, 0.04);
       }
 
       .feather-slot:hover {
         transform: translateY(-4px);
         box-shadow: 0 10px 24px rgba(110, 60, 80, 0.1);
-        background: rgba(255, 255, 255, 0.95);
+        background: #ffffff;
       }
 
-      .feather-slot.locked {
-        opacity: 0.75;
-        border-style: dashed;
-        border-color: rgba(180, 140, 150, 0.4);
-        background: rgba(255, 255, 255, 0.5);
-      }
-
-      .feather-slot.active-game {
-        border: 1.5px solid var(--coral-primary);
-        box-shadow: 0 6px 20px rgba(223, 104, 104, 0.18);
+      .feather-slot.completed {
+        border-color: #e5b758;
+        background: #fffcf4;
       }
 
       .feather-icon-wrap {
-        width: 54px;
-        height: 54px;
+        width: 52px;
+        height: 52px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 14px;
+        margin-bottom: 12px;
         background: #fbf0f0;
         color: var(--coral-primary);
         transition: all 0.3s ease;
@@ -430,31 +513,31 @@
 
       .feather-slot.completed .feather-icon-wrap {
         background: #fbf0d9;
-        color: #c99332;
+        color: #cca043;
         box-shadow: 0 0 16px rgba(212, 167, 84, 0.45);
       }
 
       .feather-name {
         font-family: var(--font-serif);
-        font-size: 1.05rem;
+        font-size: 1.1rem;
         font-weight: 600;
         color: #3b282c;
-        margin-bottom: 6px;
+        margin-bottom: 4px;
       }
 
       .feather-desc {
-        font-size: 0.78rem;
+        font-size: 0.8rem;
         color: #7d6569;
         line-height: 1.4;
       }
 
       .feather-status-badge {
         margin-top: 12px;
-        padding: 4px 10px;
+        padding: 4px 12px;
         border-radius: 12px;
-        font-size: 0.7rem;
-        font-weight: 600;
-        letter-spacing: 0.05em;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
         text-transform: uppercase;
       }
 
@@ -464,39 +547,52 @@
       }
 
       .badge-completed {
-        background: #f6eccd;
+        background: #fbf0d9;
         color: #9c6c13;
       }
 
-      .badge-locked {
-        background: #eee5e8;
-        color: #8c787e;
-      }
-
-      /* ===================================================
-         ÉCRAN D : LE JEU 1 (STYLE BOUTIQUE PARISIENNE)
-         =================================================== */
-      #jeu-1 {
+      /* Bannière finale quand les 5 plumes sont débloquées */
+      .final-treasure-card {
+        margin-top: 24px;
         width: 100%;
-        padding: 0 0 32px 0;
+        background: linear-gradient(135deg, #fff7ea 0%, #ffedd2 100%);
+        border: 2px solid #e5b758;
+        border-radius: 16px;
+        padding: 24px;
         display: none;
         flex-direction: column;
         align-items: center;
-        position: relative;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(212, 167, 84, 0.25);
+        animation: fadeIn 0.6s ease;
       }
 
-      /* Store de boutique parisienne (auvent rayé rouge corail et crème) */
+      .final-treasure-card.visible {
+        display: flex;
+      }
+
+      /* ===================================================
+         ÉCRAN D : LE JEU 1 (BOUTIQUE PARISIENNE - RECAMIER)
+         =================================================== */
+      #jeu-1 {
+        width: 100%;
+        padding-bottom: 24px;
+      }
+
       .store-awning {
         width: 100%;
+        max-width: 560px;
         position: relative;
         user-select: none;
         box-shadow: 0 3px 10px rgba(0,0,0,0.06);
         margin-bottom: 12px;
+        border-radius: 8px 8px 0 0;
+        overflow: hidden;
       }
 
       .awning-stripes {
         width: 100%;
-        height: 38px;
+        height: 36px;
         background: repeating-linear-gradient(
           90deg,
           var(--coral-primary) 0px,
@@ -508,25 +604,24 @@
 
       .awning-valance {
         width: 100%;
-        height: 18px;
+        height: 16px;
         margin-top: -1px;
         background: radial-gradient(circle at 16px 0, #fff8f6 15px, transparent 16px),
                     radial-gradient(circle at 48px 0, var(--coral-primary) 15px, transparent 16px);
         background-size: 64px 20px;
       }
 
-      /* Barre de navigation supérieure de la Boutique */
       .boutique-nav {
         width: 100%;
         max-width: 540px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0 16px 6px;
+        padding: 0 12px 6px;
       }
 
       .btn-back-hub {
-        background: rgba(255, 255, 255, 0.85);
+        background: rgba(255, 255, 255, 0.9);
         border: 1px solid var(--border-soft);
         color: var(--text-dark);
         padding: 6px 14px;
@@ -538,7 +633,6 @@
         align-items: center;
         gap: 6px;
         font-family: var(--font-sans);
-        box-shadow: 0 2px 6px rgba(60, 20, 20, 0.04);
         transition: all 0.2s ease;
       }
 
@@ -549,17 +643,16 @@
       }
 
       .attempt-indicator {
-        font-size: 0.8rem;
+        font-size: 0.82rem;
         font-style: italic;
         color: var(--text-muted);
         font-family: var(--font-poetic);
       }
 
-      /* En-tête de la Boutique */
       .boutique-header {
         width: 100%;
         max-width: 540px;
-        padding: 4px 16px 8px;
+        padding: 4px 12px 8px;
         text-align: center;
       }
 
@@ -568,7 +661,7 @@
         align-items: center;
         gap: 8px;
         font-size: 11px;
-        letter-spacing: 0.22em;
+        letter-spacing: 0.18em;
         text-transform: uppercase;
         color: #9e6460;
         font-weight: 600;
@@ -579,30 +672,28 @@
       .subtitle-ribbon::after {
         content: "";
         display: inline-block;
-        width: 22px;
+        width: 20px;
         height: 1px;
         background-color: #d4a373;
         opacity: 0.7;
       }
 
       .boutique-title {
-        font-size: 26px;
+        font-size: 24px;
         font-weight: 600;
-        letter-spacing: 0.03em;
+        letter-spacing: 0.02em;
         color: var(--text-dark);
-        margin-bottom: 3px;
-        font-family: var(--font-sans);
+        margin-bottom: 2px;
       }
 
       .boutique-tagline {
         font-size: 13px;
         font-style: italic;
         color: var(--text-muted);
-        margin-bottom: 10px;
+        margin-bottom: 8px;
         font-family: var(--font-poetic);
       }
 
-      /* Boîte de coordonnées GPS */
       .coords-wrapper {
         display: flex;
         justify-content: center;
@@ -612,15 +703,15 @@
       .coords-box {
         display: inline-flex;
         align-items: center;
-        gap: 10px;
-        background: rgba(255, 255, 255, 0.9);
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.95);
         border: 1px solid var(--border-soft);
         border-radius: 9999px;
-        padding: 6px 14px;
+        padding: 5px 14px;
         box-shadow: 0 2px 6px rgba(60, 20, 20, 0.05);
-        backdrop-filter: blur(4px);
-        transition: all 0.25s ease;
+        cursor: pointer;
         position: relative;
+        transition: all 0.2s ease;
       }
 
       .coords-box:hover {
@@ -630,9 +721,9 @@
 
       .coords-text {
         font-family: monospace;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 600;
-        letter-spacing: 0.06em;
+        letter-spacing: 0.05em;
         color: var(--text-dark);
       }
 
@@ -640,18 +731,12 @@
         background: none;
         border: none;
         cursor: pointer;
-        padding: 4px;
+        padding: 3px;
         border-radius: 50%;
         color: var(--text-muted);
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: color 0.2s, background 0.2s;
-      }
-
-      .copy-btn:hover {
-        color: var(--coral-primary);
-        background: #fae8e8;
       }
 
       .copy-toast {
@@ -678,41 +763,39 @@
         transform: translateX(-50%) translateY(2px);
       }
 
-      /* Zone de jeu Wordle */
       .game-area {
         width: 100%;
         max-width: 540px;
-        padding: 4px 16px;
+        padding: 4px 12px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        transition: opacity 0.5s ease;
       }
 
       .wordle-grid {
         display: flex;
         flex-direction: column;
-        gap: 6px;
-        margin: 8px 0 10px;
+        gap: 5px;
+        margin: 6px 0 10px;
       }
 
       .wordle-row {
         display: flex;
-        gap: 6px;
+        gap: 5px;
       }
 
       .wordle-tile {
-        width: 44px;
-        height: 50px;
+        width: 42px;
+        height: 48px;
         border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 20px;
+        font-size: 19px;
         font-weight: 700;
         text-transform: uppercase;
         user-select: none;
-        background: rgba(255, 255, 255, 0.55);
+        background: rgba(255, 255, 255, 0.7);
         border: 1px solid var(--tile-border);
         color: var(--text-dark);
         box-shadow: 0 1px 3px rgba(60, 20, 20, 0.04);
@@ -722,19 +805,18 @@
       @media (max-width: 480px) {
         .wordle-tile {
           width: 36px;
-          height: 44px;
-          font-size: 17px;
+          height: 42px;
+          font-size: 16px;
           border-radius: 6px;
         }
         .wordle-row, .wordle-grid {
-          gap: 4px;
+          gap: 3px;
         }
       }
 
       .wordle-tile.filled {
         border-color: var(--coral-primary);
         background: #fffcfb;
-        box-shadow: 0 2px 6px rgba(223, 104, 104, 0.18);
         transform: scale(1.02);
       }
 
@@ -742,42 +824,31 @@
         background-color: var(--wordle-green) !important;
         border-color: transparent !important;
         color: #ffffff !important;
-        animation: tileFlip 0.5s ease forwards;
       }
 
       .wordle-tile.present {
         background-color: var(--wordle-gold) !important;
         border-color: transparent !important;
         color: #ffffff !important;
-        animation: tileFlip 0.5s ease forwards;
       }
 
       .wordle-tile.absent {
         background-color: var(--wordle-gray) !important;
         border-color: transparent !important;
         color: #ffffff !important;
-        animation: tileFlip 0.5s ease forwards;
       }
 
-      @keyframes tileFlip {
-        0% { transform: rotateX(0deg); }
-        50% { transform: rotateX(90deg); }
-        100% { transform: rotateX(0deg); }
-      }
-
-      /* Zone d'indice (Clue Zone) */
       .clue-zone {
         width: 100%;
         max-width: 440px;
-        margin: 6px 0 12px;
-        background: rgba(255, 255, 255, 0.88);
+        margin: 4px 0 10px;
+        background: rgba(255, 255, 255, 0.9);
         border: 1px solid var(--border-soft);
         border-radius: 12px;
-        padding: 10px 16px;
+        padding: 8px 14px;
         text-align: center;
         box-shadow: 0 2px 6px rgba(50, 20, 20, 0.04);
-        backdrop-filter: blur(4px);
-        min-height: 52px;
+        min-height: 48px;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -787,7 +858,7 @@
       .clue-label {
         font-size: 11px;
         text-transform: uppercase;
-        letter-spacing: 0.18em;
+        letter-spacing: 0.16em;
         color: #a87268;
         font-weight: 600;
         margin-bottom: 2px;
@@ -797,7 +868,7 @@
         font-family: var(--font-clue);
         font-size: 18px;
         font-weight: 700;
-        letter-spacing: 0.22em;
+        letter-spacing: 0.2em;
         color: #b84a4a;
       }
 
@@ -812,12 +883,11 @@
         font-size: 12px;
         color: #b83e3e;
         font-weight: 600;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
         min-height: 18px;
         text-align: center;
       }
 
-      /* Zone de saisie */
       .input-zone {
         width: 100%;
         max-width: 440px;
@@ -833,19 +903,17 @@
 
       .input-field {
         width: 100%;
-        height: 48px;
+        height: 46px;
         padding: 0 45px 0 16px;
         border-radius: 12px;
         border: 1px solid var(--border-soft);
         background: rgba(255, 255, 255, 0.95);
         font-size: 16px;
         font-weight: 600;
-        letter-spacing: 0.12em;
+        letter-spacing: 0.1em;
         text-transform: uppercase;
         color: var(--text-dark);
-        box-shadow: 0 2px 6px rgba(50, 20, 20, 0.04);
         outline: none;
-        transition: border-color 0.2s, box-shadow 0.2s;
         font-family: var(--font-sans);
       }
 
@@ -866,18 +934,17 @@
       }
 
       .validate-btn {
-        height: 48px;
-        padding: 0 22px;
+        height: 46px;
+        padding: 0 20px;
         border-radius: 12px;
         border: none;
         background: var(--coral-primary);
         color: #ffffff;
-        font-family: var(--font-sans);
         font-size: 14px;
         font-weight: 600;
         cursor: pointer;
-        box-shadow: 0 3px 10px rgba(223, 104, 104, 0.35);
-        transition: background 0.2s, transform 0.1s;
+        box-shadow: 0 3px 10px rgba(223, 104, 104, 0.3);
+        transition: background 0.2s;
         display: inline-flex;
         align-items: center;
         gap: 6px;
@@ -888,23 +955,12 @@
         background: var(--coral-hover);
       }
 
-      .validate-btn:active {
-        transform: scale(0.98);
-      }
-
-      .validate-btn:disabled,
-      .input-field:disabled {
-        opacity: 0.55;
-        cursor: not-allowed;
-      }
-
-      /* Clavier virtuel responsive */
       .virtual-keyboard {
         width: 100%;
         max-width: 480px;
         display: flex;
         flex-direction: column;
-        gap: 5px;
+        gap: 4px;
         margin-top: 4px;
         user-select: none;
       }
@@ -916,22 +972,20 @@
       }
 
       .key-btn {
-        height: 40px;
+        height: 38px;
         flex: 1;
-        max-width: 40px;
+        max-width: 38px;
         border-radius: 6px;
         border: 1px solid var(--border-soft);
         background: rgba(255, 255, 255, 0.9);
         color: var(--text-dark);
-        font-family: inherit;
         font-size: 13px;
         font-weight: 600;
         cursor: pointer;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-        transition: all 0.15s ease;
         display: flex;
         align-items: center;
         justify-content: center;
+        transition: all 0.15s ease;
       }
 
       .key-btn:hover {
@@ -940,7 +994,7 @@
       }
 
       .key-btn.action-key {
-        max-width: 62px;
+        max-width: 60px;
         font-size: 11px;
         text-transform: uppercase;
       }
@@ -949,10 +1003,6 @@
         background: var(--coral-primary);
         color: #ffffff;
         border-color: var(--coral-primary);
-      }
-
-      .key-btn.enter-key:hover {
-        background: var(--coral-hover);
       }
 
       .key-btn.key-correct {
@@ -971,12 +1021,10 @@
         background: var(--wordle-gray) !important;
         color: #554448 !important;
         border-color: transparent !important;
-        opacity: 0.65;
+        opacity: 0.6;
       }
 
-      /* ===================================================
-         ÉTAPE E : ÉTAT D'ÉCHEC VICHY (GAME OVER MAGNIFIQUE)
-         =================================================== */
+      /* Game Over Vichy */
       body.game-over-vichy {
         background-color: #fcf4ec !important;
         background-image: 
@@ -992,70 +1040,131 @@
         display: none;
         width: 100%;
         max-width: 460px;
-        margin: 30px auto;
-        padding: 0 20px;
-        animation: fadeIn 0.8s ease-in-out forwards;
+        margin: 20px auto;
+        padding: 0 16px;
+        animation: fadeIn 0.5s ease forwards;
       }
 
       .game-over-card {
-        background: rgba(255, 255, 255, 0.96);
+        background: rgba(255, 255, 255, 0.97);
         border: 1px solid #e8d5cc;
-        border-radius: 20px;
-        padding: 38px 28px;
+        border-radius: 18px;
+        padding: 32px 24px;
         text-align: center;
-        box-shadow: 0 15px 35px -5px rgba(90, 50, 45, 0.18);
-      }
-
-      .card-ribbon {
-        width: 48px;
-        height: 4px;
-        background: var(--coral-primary);
-        border-radius: 9999px;
-        margin: 0 auto 20px;
-      }
-
-      .game-over-title {
-        font-family: var(--font-serif);
-        font-size: 24px;
-        font-weight: 600;
-        color: var(--text-dark);
-        margin-bottom: 12px;
-      }
-
-      .game-over-message {
-        font-family: var(--font-poetic);
-        font-size: 15px;
-        color: var(--text-muted);
-        line-height: 1.6;
-        font-style: italic;
-        margin-bottom: 24px;
+        box-shadow: 0 12px 30px rgba(90, 50, 45, 0.15);
       }
 
       .restart-btn {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        padding: 14px 32px;
+        padding: 12px 28px;
         border-radius: 9999px;
         background: var(--coral-primary);
         color: #ffffff;
         border: none;
-        font-family: inherit;
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 600;
         cursor: pointer;
-        box-shadow: 0 5px 18px rgba(223, 104, 104, 0.4);
-        transition: background 0.2s, transform 0.15s;
-      }
-
-      .restart-btn:hover {
-        background: var(--coral-hover);
-        transform: translateY(-2px);
+        margin-top: 16px;
       }
 
       /* ===================================================
-         MODAL DE VICTOIRE (PLUME OBTENUE)
+         ÉCRANS DES ÉPREUVES 2, 3, 4, 5 & FINALE
          =================================================== */
+      .quest-card {
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(10px);
+        border-radius: 18px;
+        border: 1px solid rgba(200, 190, 185, 0.5);
+        max-width: 580px;
+        width: 100%;
+        padding: 32px 24px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .quest-icon-badge {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 14px;
+      }
+
+      .quest-title {
+        font-family: var(--font-serif);
+        font-size: 1.65rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .quest-subtitle {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        margin-bottom: 16px;
+        font-weight: 600;
+      }
+
+      .quest-poem-text {
+        font-family: var(--font-poetic);
+        font-size: 1.05rem;
+        line-height: 1.7;
+        font-style: italic;
+        margin-bottom: 22px;
+        color: #4a3e3c;
+      }
+
+      .options-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        width: 100%;
+        max-width: 440px;
+        margin-bottom: 18px;
+      }
+
+      @media (min-width: 480px) {
+        .options-grid.two-cols {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      .option-btn {
+        background: #ffffff;
+        border: 1px solid #dfd3cd;
+        border-radius: 12px;
+        padding: 14px 16px;
+        font-size: 0.92rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.2s ease;
+        color: var(--text-dark);
+      }
+
+      .option-btn:hover {
+        border-color: #2b221e;
+        background: #fdfbf9;
+        transform: translateY(-2px);
+      }
+
+      .option-btn.selected-correct {
+        background: #eaf6ec !important;
+        border-color: #7bc788 !important;
+        color: #2d6b38 !important;
+      }
+
+      /* Modal de Victoire / Confirmations */
       .modal-overlay {
         display: none;
         position: fixed;
@@ -1066,7 +1175,7 @@
         align-items: center;
         justify-content: center;
         padding: 20px;
-        animation: fadeIn 0.4s ease forwards;
+        animation: fadeIn 0.3s ease forwards;
       }
 
       .modal-card {
@@ -1075,73 +1184,12 @@
         border: 1px solid var(--border-soft);
         max-width: 480px;
         width: 100%;
-        padding: 34px 26px;
+        padding: 32px 24px;
         text-align: center;
-        box-shadow: 0 20px 40px rgba(80, 30, 30, 0.2);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
         display: flex;
         flex-direction: column;
         align-items: center;
-      }
-
-      .victory-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.15em;
-        color: #b05252;
-        background: #fdf0f0;
-        padding: 4px 14px;
-        border-radius: 999px;
-        margin-bottom: 14px;
-      }
-
-      .victory-feather-wrap {
-        width: 60px;
-        height: 60px;
-        background: #fbf0d9;
-        color: #cca043;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 14px;
-        box-shadow: 0 0 22px rgba(212, 167, 84, 0.55);
-      }
-
-      .victory-title {
-        font-family: var(--font-serif);
-        font-size: 24px;
-        font-weight: 600;
-        color: var(--text-dark);
-        margin-bottom: 8px;
-      }
-
-      .victory-word-box {
-        background: #fff7f5;
-        border: 1px solid #f2dedb;
-        border-radius: 12px;
-        padding: 12px 24px;
-        margin: 16px 0;
-        width: 100%;
-      }
-
-      .victory-word {
-        font-family: monospace;
-        font-size: 28px;
-        font-weight: 800;
-        letter-spacing: 0.25em;
-        color: var(--coral-primary);
-      }
-
-      .victory-msg {
-        font-family: var(--font-poetic);
-        font-size: 14px;
-        color: var(--text-muted);
-        line-height: 1.6;
-        margin-bottom: 22px;
       }
 
       .modal-buttons-group {
@@ -1149,83 +1197,63 @@
         gap: 10px;
         flex-wrap: wrap;
         justify-content: center;
+        margin-top: 18px;
       }
 
-      .btn-hub-return {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 12px 24px;
-        border-radius: 9999px;
+      .btn-primary-action {
         background: #2b221e;
         color: #ffffff;
         border: none;
-        font-family: var(--font-sans);
-        font-size: 14px;
+        border-radius: 999px;
+        padding: 12px 24px;
+        font-size: 0.88rem;
         font-weight: 600;
         cursor: pointer;
-        box-shadow: 0 4px 14px rgba(43, 34, 30, 0.25);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         transition: all 0.2s ease;
       }
 
-      .btn-hub-return:hover {
+      .btn-primary-action:hover {
         background: #463731;
-        transform: translateY(-2px);
+        transform: translateY(-1px);
       }
 
-      /* ===================================================
-         ÉCRAN F : JEUX PLACEHOLDERS (2, 3, 4, 5) & FINALE
-         =================================================== */
-      .placeholder-screen {
-        text-align: center;
-        max-width: 600px;
-        min-height: 100vh;
-        justify-content: center;
-        color: #ffffff;
-      }
-
-      .placeholder-card {
-        background: rgba(255, 255, 255, 0.16);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        border-radius: 18px;
-        padding: 44px 28px;
-        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.1);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-
-      .placeholder-icon {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.2);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 18px;
-        color: #ffffff;
-      }
-
-      .placeholder-title {
-        font-family: var(--font-serif);
-        font-size: 1.85rem;
+      .btn-secondary-action {
+        background: #f4ede9;
+        color: #3b282c;
+        border: 1px solid #dfd0c7;
+        border-radius: 999px;
+        padding: 12px 20px;
+        font-size: 0.88rem;
         font-weight: 600;
-        margin-bottom: 10px;
-        letter-spacing: 0.02em;
+        cursor: pointer;
+        transition: all 0.2s ease;
       }
 
-      .placeholder-text {
-        font-family: var(--font-poetic);
-        font-style: italic;
-        font-size: 1.1rem;
-        opacity: 0.9;
-        margin-bottom: 28px;
+      .btn-secondary-action:hover {
+        background: #e8ddd5;
+      }
+
+      .btn-danger-action {
+        background: #c94444;
+        color: #ffffff;
+        border: none;
+        border-radius: 999px;
+        padding: 12px 20px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .btn-danger-action:hover {
+        background: #b03636;
       }
 
       @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(8px); }
+        from { opacity: 0; transform: translateY(6px); }
         to { opacity: 1; transform: translateY(0); }
       }
     </style>
@@ -1234,13 +1262,49 @@
     <!-- Motif décoratif subtil -->
     <div class="ambient-motif" aria-hidden="true"></div>
 
+    <!-- Barre supérieure universelle -->
+    <header class="top-navbar">
+      <div class="nav-left">
+        <div class="app-brand" id="nav-brand-title" role="button" tabindex="0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path>
+            <line x1="16" y1="8" x2="2" y2="22"></line>
+            <line x1="17.5" y1="15" x2="9" y2="15"></line>
+          </svg>
+          <span>Cinq Plumes</span>
+        </div>
+        <span class="save-status-pill" id="save-indicator" title="Vos épreuves et plumes sont sauvegardées sur cet appareil">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Sauvegardé
+        </span>
+      </div>
+
+      <div class="nav-right">
+        <button class="feather-counter-btn" id="nav-hub-btn" type="button" title="Accéder au Cabinet des Songes">
+          <span>🪶</span>
+          <span id="nav-feather-count">0/5 Plumes</span>
+        </button>
+
+        <!-- Bouton demandé par l'utilisateur : Recommencer / Voir depuis le début -->
+        <button class="btn-restart-app" id="btn-show-restart-modal" type="button" title="Revoir l'introduction ou recommencer toute l'aventure">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+          </svg>
+          <span>Depuis le début</span>
+        </button>
+      </div>
+    </header>
+
     <div id="app-container">
 
       <!-- ===================================================
            ÉTAPE A : L'ENVELOPPE MYSTÈRE
            =================================================== -->
-      <section id="ecran-enveloppe" class="screen active" aria-label="Écran de démarrage">
-        <div class="envelope-wrapper" id="btn-open-envelope" role="button" tabindex="0" aria-label="Ouvrir l'enveloppe">
+      <section id="ecran-enveloppe" class="screen active" aria-label="Écran d'enveloppe">
+        <div class="envelope-wrapper" id="btn-open-envelope" role="button" tabindex="0" aria-label="Ouvrir l'enveloppe scellée">
           <div class="envelope">
             <div class="envelope-flap" id="envelope-flap"></div>
             <div class="wax-seal">
@@ -1252,8 +1316,14 @@
             </div>
             <div class="envelope-pocket"></div>
           </div>
-          <p class="envelope-caption">Cliquez pour ouvrir</p>
+          <p class="envelope-caption">Cliquez pour briser le sceau</p>
         </div>
+        <button type="button" class="btn-open-direct" id="btn-open-direct">
+          Ouvrir la lettre
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
       </section>
 
       <!-- ===================================================
@@ -1269,7 +1339,7 @@
           <p class="poem-line">Ouvre le premier chapitre.</p>
 
           <button id="btn-start-quest" class="btn-elegant" type="button">
-            Commencer la quête
+            <span>Entrer dans le Cabinet</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="5" y1="12" x2="19" y2="12"></line>
               <polyline points="12 5 19 12 12 19"></polyline>
@@ -1288,99 +1358,107 @@
         </div>
 
         <div class="feathers-grid">
-          <!-- Jeu 1 : Actif (La Boutique / L'Énigme Littéraire) -->
-          <div class="feather-slot active-game" id="slot-game-1" role="button" tabindex="0" aria-label="Épreuve 1">
+          <!-- Jeu 1 : La Boutique -->
+          <div class="feather-slot" id="slot-game-1" role="button" tabindex="0">
             <div class="feather-icon-wrap" id="feather-icon-1">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path>
                 <line x1="16" y1="8" x2="2" y2="22"></line>
                 <line x1="17.5" y1="15" x2="9" y2="15"></line>
               </svg>
             </div>
             <h2 class="feather-name">Épreuve 1</h2>
-            <p class="feather-desc">La Boutique • L'Énigme Littéraire</p>
-            <span class="feather-status-badge badge-unlocked" id="badge-game-1">Ouvrir</span>
+            <p class="feather-desc">La Boutique de Louise • Wordle Littéraire</p>
+            <span class="feather-status-badge badge-unlocked" id="badge-game-1">Commencer</span>
           </div>
 
-          <!-- Jeu 2 : Verrouillé -->
-          <div class="feather-slot locked" id="slot-game-2" role="button" tabindex="0" aria-label="Épreuve 2">
-            <div class="feather-icon-wrap">
+          <!-- Jeu 2 : L'Apothicaire -->
+          <div class="feather-slot" id="slot-game-2" role="button" tabindex="0">
+            <div class="feather-icon-wrap" id="feather-icon-2" style="background: #eef5f0; color: #4e805d;">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
               </svg>
             </div>
             <h2 class="feather-name">Épreuve 2</h2>
-            <p class="feather-desc">L'Officine de l'Apothicaire</p>
-            <span class="feather-status-badge badge-locked">Verrouillée</span>
+            <p class="feather-desc">L'Officine de l'Apothicaire • Remèdes Secrets</p>
+            <span class="feather-status-badge badge-unlocked" id="badge-game-2">Explorer</span>
           </div>
 
-          <!-- Jeu 3 : Verrouillé -->
-          <div class="feather-slot locked" id="slot-game-3" role="button" tabindex="0" aria-label="Épreuve 3">
-            <div class="feather-icon-wrap">
+          <!-- Jeu 3 : Dostoïevski -->
+          <div class="feather-slot" id="slot-game-3" role="button" tabindex="0">
+            <div class="feather-icon-wrap" id="feather-icon-3" style="background: #f7eff1; color: #874955;">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
               </svg>
             </div>
             <h2 class="feather-name">Épreuve 3</h2>
-            <p class="feather-desc">L'Ombre de Dostoïevski</p>
-            <span class="feather-status-badge badge-locked">Verrouillée</span>
+            <p class="feather-desc">L'Ombre de Dostoïevski • La Citation Perdue</p>
+            <span class="feather-status-badge badge-unlocked" id="badge-game-3">Explorer</span>
           </div>
 
-          <!-- Jeu 4 : Verrouillé -->
-          <div class="feather-slot locked" id="slot-game-4" role="button" tabindex="0" aria-label="Épreuve 4">
-            <div class="feather-icon-wrap">
+          <!-- Jeu 4 : Petit Prince -->
+          <div class="feather-slot" id="slot-game-4" role="button" tabindex="0">
+            <div class="feather-icon-wrap" id="feather-icon-4" style="background: #fdf6ec; color: #b8863b;">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
               </svg>
             </div>
             <h2 class="feather-name">Épreuve 4</h2>
-            <p class="feather-desc">L'Astre du Petit Prince</p>
-            <span class="feather-status-badge badge-locked">Verrouillée</span>
+            <p class="feather-desc">L'Astre du Petit Prince • L'Astéroïde B612</p>
+            <span class="feather-status-badge badge-unlocked" id="badge-game-4">Explorer</span>
           </div>
 
-          <!-- Jeu 5 : Verrouillé -->
-          <div class="feather-slot locked" id="slot-game-5" role="button" tabindex="0" aria-label="Épreuve 5">
-            <div class="feather-icon-wrap">
+          <!-- Jeu 5 : Le Cygne -->
+          <div class="feather-slot" id="slot-game-5" role="button" tabindex="0">
+            <div class="feather-icon-wrap" id="feather-icon-5" style="background: #edf3f7; color: #4b6f88;">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                <path d="M2 12h20M2 18h20M2 6h20"></path>
               </svg>
             </div>
             <h2 class="feather-name">Épreuve 5</h2>
-            <p class="feather-desc">Le Cygne sur la Grève</p>
-            <span class="feather-status-badge badge-locked">Verrouillée</span>
+            <p class="feather-desc">Le Cygne sur la Grève • Les Eaux Oubliées</p>
+            <span class="feather-status-badge badge-unlocked" id="badge-game-5">Explorer</span>
           </div>
+        </div>
+
+        <!-- Carte de triomphe final qui s'allume quand 5/5 plumes sont réunies -->
+        <div class="final-treasure-card" id="final-treasure-banner">
+          <div style="font-size: 36px; margin-bottom: 8px;">✨ 👑 🗺️</div>
+          <h2 style="font-family: var(--font-serif); font-size: 1.5rem; color: #734c10; margin-bottom: 6px;">
+            Le Secret Ultime Révélé !
+          </h2>
+          <p style="font-family: var(--font-poetic); font-size: 1rem; color: #694b29; max-width: 540px; margin-bottom: 14px;">
+            Les cinq plumes magiques s'unissent pour révéler le sanctuaire caché au cœur de la France :
+            <strong>La Forêt de Tronçais & le Chêne Millénaire</strong>. Bravo pour cette quête sensorielle accomplie !
+          </p>
+          <button type="button" class="btn-primary-action" id="btn-view-epilogue">
+            Consulter le parchemin de fin
+          </button>
         </div>
       </section>
 
       <!-- ===================================================
-           ÉTAPE D : LE JEU 1 (STYLE BOUTIQUE PARISIENNE)
+           ÉTAPE D : LE JEU 1 (BOUTIQUE PARISIENNE - RECAMIER)
            =================================================== -->
-      <section id="jeu-1" class="screen" aria-label="Épreuve 1 - La Boutique de Louise">
-        
-        <!-- Store de boutique parisienne (auvent rayé corail et crème) -->
+      <section id="jeu-1" class="screen" aria-label="Épreuve 1">
         <header class="store-awning">
           <div class="awning-stripes"></div>
           <div class="awning-valance"></div>
         </header>
 
-        <!-- Navigation de retour et compteur -->
         <div class="boutique-nav">
           <button class="btn-back-hub" id="btn-back-hub-1" type="button">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
-            Menu
+            Menu des Plumes
           </button>
           <span class="attempt-indicator">
             Tentative <span id="attempt-counter">1</span>/6
           </span>
         </div>
 
-        <!-- En-tête : Enseigne et Coordonnées GPS -->
         <div class="boutique-header">
           <div class="subtitle-ribbon">Épreuve 1 • L'Énigme Littéraire</div>
           <h1 class="boutique-title">La Boutique de Louise</h1>
@@ -1392,27 +1470,21 @@
                 <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
                 <circle cx="12" cy="10" r="3"/>
               </svg>
-
-              <span class="coords-text" id="coords-val">48.851749, 2.327920</span>
-
-              <button class="copy-btn" id="copy-btn" title="Copier les coordonnées" aria-label="Copier les coordonnées" type="button">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <span class="coords-text">48.851749, 2.327920</span>
+              <button class="copy-btn" id="copy-btn" title="Copier les coordonnées" type="button">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <rect width="8" height="4" x="8" y="2" rx="1" ry="1"/>
                   <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
                 </svg>
               </button>
-
               <span class="copy-toast" id="copy-toast">Coordonnées copiées !</span>
             </div>
           </div>
         </div>
 
-        <!-- Zone de jeu active -->
         <main class="game-area" id="game-area">
-          <!-- Grille Wordle 6x8 -->
-          <div class="wordle-grid" id="wordle-grid" aria-label="Grille de 6 tentatives et 8 lettres"></div>
+          <div class="wordle-grid" id="wordle-grid" aria-label="Grille Wordle de 8 lettres"></div>
 
-          <!-- Zone d'indice -->
           <div class="clue-zone" id="clue-zone">
             <span class="clue-empty" id="clue-empty">Faites votre première tentative pour révéler un indice...</span>
             <div id="clue-content" style="display: none;">
@@ -1423,7 +1495,6 @@
 
           <div class="error-msg" id="error-msg"></div>
 
-          <!-- Formulaire de saisie -->
           <form class="input-zone" id="input-form" autocomplete="off">
             <div class="input-field-wrapper">
               <input 
@@ -1432,10 +1503,8 @@
                 class="input-field" 
                 maxlength="8" 
                 placeholder="Mot de 8 lettres..." 
-                autocomplete="off" 
-                autocorrect="off" 
+                autocomplete="off"
                 spellcheck="false"
-                aria-label="Entrez votre mot de 8 lettres"
               />
               <span class="input-counter" id="char-counter">0/8</span>
             </div>
@@ -1444,7 +1513,6 @@
             </button>
           </form>
 
-          <!-- Clavier virtuel responsive AZERTY -->
           <div class="virtual-keyboard" id="virtual-keyboard">
             <div class="keyboard-row">
               <button type="button" class="key-btn" data-key="A">A</button>
@@ -1483,150 +1551,277 @@
           </div>
         </main>
 
-        <!-- ===================================================
-             ÉTAPE E : ÉTAT D'ÉCHEC DU JEU 1 (GAME OVER VICHY)
-             =================================================== -->
         <section class="game-over-screen" id="game-over-screen">
           <div class="game-over-card">
-            <div class="card-ribbon"></div>
-            <h2 class="game-over-title">La piste s'efface...</h2>
-            <p class="game-over-message">
-              Il faut reprendre l'enquête. Les secrets de la rue parisienne se dévoileront avec un nouveau regard.
+            <h2 style="font-family: var(--font-serif); font-size: 22px; color: var(--text-dark); margin-bottom: 8px;">La piste s'efface...</h2>
+            <p style="font-family: var(--font-poetic); font-size: 14px; color: var(--text-muted); font-style: italic; margin-bottom: 16px;">
+              Les six tentatives sont épuisées. Le mot secret était <strong>RECAMIER</strong>. Reprenez l'enquête avec un nouveau regard !
             </p>
-            <button type="button" class="restart-btn" id="restart-btn">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <button type="button" class="restart-btn" id="restart-game-btn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="1 4 1 10 7 10"></polyline>
                 <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
               </svg>
-              <span>Recommencer</span>
+              <span>Recommencer l'épreuve</span>
             </button>
           </div>
         </section>
-
-        <!-- ===================================================
-             MODAL DE FÉLICITATIONS (VICTOIRE)
-             =================================================== -->
-        <div class="modal-overlay" id="victory-modal">
-          <div class="modal-card">
-            <div class="victory-feather-wrap">
-              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path>
-                <line x1="16" y1="8" x2="2" y2="22"></line>
-                <line x1="17.5" y1="15" x2="9" y2="15"></line>
-              </svg>
-            </div>
-            
-            <span class="victory-badge">Plume magique obtenue !</span>
-            <h2 class="victory-title">Félicitations voyageuse !</h2>
-            <p style="font-size: 14px; color: #785a56; line-height: 1.5;">
-              Tu as percé le mot mystère de l'enquête littéraire :
-            </p>
-            
-            <div class="victory-word-box">
-              <div class="victory-word">RECAMIER</div>
-              <p style="font-size: 12px; color: #946965; margin-top: 4px; font-style: italic;">
-                Square & Rue Juliette Récamier — 75007 Paris
-              </p>
-            </div>
-
-            <p class="victory-msg">
-              Les coordonnées <strong>48.851749, 2.327920</strong> t'ont guidée vers la première plume magique. Le voile commence à se lever...
-            </p>
-
-            <div class="modal-buttons-group">
-              <button type="button" class="btn-hub-return" id="victory-hub-btn">
-                <span>Retour au menu</span>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
-              </button>
-              <button type="button" class="btn-back-hub" id="victory-replay-btn" style="padding: 10px 18px;">
-                <span>Rejouer l'étape</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
       </section>
 
       <!-- ===================================================
-           ÉTAPE F : LES JEUX 2, 3, 4, 5 ET FINALE
+           ÉPREUVE 2 : L'OFFICINE DE L'APOTHICAIRE
            =================================================== -->
-      <section id="jeu-2" class="screen placeholder-screen" aria-label="Épreuve 2">
-        <div class="placeholder-card">
-          <div class="placeholder-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <section id="jeu-2" class="screen" aria-label="Épreuve 2">
+        <div class="quest-card">
+          <button class="btn-back-hub" id="btn-back-hub-2" type="button" style="align-self: flex-start; margin-bottom: 12px;">
+            ← Menu
+          </button>
+          <div class="quest-icon-badge" style="background: #e4efe7; color: #437651;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
             </svg>
           </div>
-          <h1 class="placeholder-title">Épreuve 2</h1>
-          <p class="placeholder-text">L'énigme n'est pas encore révélée...</p>
-          <button class="btn-back-hub" id="btn-back-hub-2" type="button">Retour au menu</button>
+          <span class="quest-subtitle" style="color: #437651;">Épreuve 2 • Les Remèdes Secrets</span>
+          <h2 class="quest-title">L'Officine de l'Apothicaire</h2>
+          <p class="quest-poem-text">
+            « Sous l'ombre des champignons sauvages et des alambics en cuivre,<br />
+            l'apothicaire prépare le baume qui délivre.<br />
+            "Ni poison mortel de l'amanite, ni racine hurlante de mandragore...<br />
+            seule la plante sacrée qui purifie et apaise ouvre le coffre d'or." »
+          </p>
+
+          <p style="font-size: 0.88rem; font-weight: 600; margin-bottom: 12px; color: #3b282c;">
+            Quelle fiole d'herboristerie contient l'élixir purificateur ?
+          </p>
+
+          <div class="options-grid two-cols">
+            <button type="button" class="option-btn" data-game="2" data-choice="amanite">
+              <span style="font-size: 20px;">🍄</span>
+              <span>L'Amanite</span>
+              <span style="font-size: 11px; color: #88726e;">Poison des bois</span>
+            </button>
+            <button type="button" class="option-btn" data-game="2" data-choice="sauge">
+              <span style="font-size: 20px;">🌿</span>
+              <span>La Sauge</span>
+              <span style="font-size: 11px; color: #88726e;">Herbe de guérison</span>
+            </button>
+            <button type="button" class="option-btn" data-game="2" data-choice="mandragore">
+              <span style="font-size: 20px;">🌱</span>
+              <span>La Mandragore</span>
+              <span style="font-size: 11px; color: #88726e;">Racine mystique</span>
+            </button>
+            <button type="button" class="option-btn" data-game="2" data-choice="ciguë">
+              <span style="font-size: 20px;">🥀</span>
+              <span>La Ciguë</span>
+              <span style="font-size: 11px; color: #88726e;">Fleur d'oubli</span>
+            </button>
+          </div>
+          <div id="game-2-feedback" class="error-msg"></div>
         </div>
       </section>
 
-      <section id="jeu-3" class="screen placeholder-screen" aria-label="Épreuve 3">
-        <div class="placeholder-card">
-          <div class="placeholder-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <!-- ===================================================
+           ÉPREUVE 3 : L'OMBRE DE DOSTOÏEVSKI
+           =================================================== -->
+      <section id="jeu-3" class="screen" aria-label="Épreuve 3">
+        <div class="quest-card">
+          <button class="btn-back-hub" id="btn-back-hub-3" type="button" style="align-self: flex-start; margin-bottom: 12px;">
+            ← Menu
+          </button>
+          <div class="quest-icon-badge" style="background: #f7eaed; color: #823847;">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
               <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
             </svg>
           </div>
-          <h1 class="placeholder-title">Épreuve 3</h1>
-          <p class="placeholder-text">L'énigme n'est pas encore révélée...</p>
-          <button class="btn-back-hub" id="btn-back-hub-3" type="button">Retour au menu</button>
+          <span class="quest-subtitle" style="color: #823847;">Épreuve 3 • Le Mot de l'Auteur</span>
+          <h2 class="quest-title">L'Ombre de Dostoïevski</h2>
+          <p class="quest-poem-text">
+            « Dans les brumes de Saint-Pétersbourg, la plume lourde de l'écrivain a tracé cette prophétie dans <em>L'Idiot</em> :<br />
+            "La [......] sauvera le monde."<br />
+            Retrouvez le mot sacré pour éveiller la troisième plume. »
+          </p>
+
+          <form id="form-game-3" class="input-zone" style="max-width: 360px;" autocomplete="off">
+            <input 
+              type="text" 
+              id="input-game-3" 
+              class="input-field" 
+              placeholder="Complétez la citation..." 
+              autocomplete="off"
+            />
+            <button type="submit" class="validate-btn" style="background: #823847;">Valider</button>
+          </form>
+          <p style="font-size: 11px; color: #8a7376; margin-top: 4px; font-style: italic;">
+            Indice : Mot féminin de 6 lettres (commence par B...)
+          </p>
+          <div id="game-3-feedback" class="error-msg"></div>
         </div>
       </section>
 
-      <section id="jeu-4" class="screen placeholder-screen" aria-label="Épreuve 4">
-        <div class="placeholder-card">
-          <div class="placeholder-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <!-- ===================================================
+           ÉPREUVE 4 : L'ASTRE DU PETIT PRINCE
+           =================================================== -->
+      <section id="jeu-4" class="screen" aria-label="Épreuve 4">
+        <div class="quest-card">
+          <button class="btn-back-hub" id="btn-back-hub-4" type="button" style="align-self: flex-start; margin-bottom: 12px;">
+            ← Menu
+          </button>
+          <div class="quest-icon-badge" style="background: #fdf3e5; color: #b5802a;">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
             </svg>
           </div>
-          <h1 class="placeholder-title">Épreuve 4</h1>
-          <p class="placeholder-text">L'énigme n'est pas encore révélée...</p>
-          <button class="btn-back-hub" id="btn-back-hub-4" type="button">Retour au menu</button>
+          <span class="quest-subtitle" style="color: #b5802a;">Épreuve 4 • La Constellation Secrète</span>
+          <h2 class="quest-title">L'Astre du Petit Prince</h2>
+          <p class="quest-poem-text">
+            « "On ne voit bien qu'avec le cœur. L'essentiel est invisible pour les yeux."<br />
+            Sur quel astéroïde l'enfant aux cheveux d'or prenait-il soin de son unique rose ? »
+          </p>
+
+          <div class="options-grid two-cols">
+            <button type="button" class="option-btn" data-game="4" data-choice="A101">
+              <span style="font-size: 18px;">🪐</span>
+              <span>Astro A-101</span>
+            </button>
+            <button type="button" class="option-btn" data-game="4" data-choice="B612">
+              <span style="font-size: 18px;">🌹</span>
+              <span>L'Astéroïde B-612</span>
+            </button>
+            <button type="button" class="option-btn" data-game="4" data-choice="C3PO">
+              <span style="font-size: 18px;">✨</span>
+              <span>Secteur C-300</span>
+            </button>
+            <button type="button" class="option-btn" data-game="4" data-choice="Z800">
+              <span style="font-size: 18px;">⭐</span>
+              <span>Étoile Z-800</span>
+            </button>
+          </div>
+          <div id="game-4-feedback" class="error-msg"></div>
         </div>
       </section>
 
-      <section id="jeu-5" class="screen placeholder-screen" aria-label="Épreuve 5">
-        <div class="placeholder-card">
-          <div class="placeholder-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <!-- ===================================================
+           ÉPREUVE 5 : LE CYGNE SUR LA GRÈVE
+           =================================================== -->
+      <section id="jeu-5" class="screen" aria-label="Épreuve 5">
+        <div class="quest-card">
+          <button class="btn-back-hub" id="btn-back-hub-5" type="button" style="align-self: flex-start; margin-bottom: 12px;">
+            ← Menu
+          </button>
+          <div class="quest-icon-badge" style="background: #e8f0f5; color: #3f6882;">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M2 12h20M2 18h20M2 6h20"></path>
             </svg>
           </div>
-          <h1 class="placeholder-title">Épreuve 5</h1>
-          <p class="placeholder-text">L'énigme n'est pas encore révélée...</p>
-          <button class="btn-back-hub" id="btn-back-hub-5" type="button">Retour au menu</button>
+          <span class="quest-subtitle" style="color: #3f6882;">Épreuve 5 • L'Ultime Plume</span>
+          <h2 class="quest-title">Le Cygne sur la Grève</h2>
+          <p class="quest-poem-text">
+            « Écoute le murmure du ressac. Un majestueux oiseau blanc fend les eaux calmes.<br />
+            Remets les lettres du rivage dans l'ordre pour appeler la dernière plume :<br />
+            <strong>G - N - C - Y - E</strong> »
+          </p>
+
+          <form id="form-game-5" class="input-zone" style="max-width: 360px;" autocomplete="off">
+            <input 
+              type="text" 
+              id="input-game-5" 
+              class="input-field" 
+              maxlength="5" 
+              placeholder="Mot de 5 lettres..." 
+              autocomplete="off"
+            />
+            <button type="submit" class="validate-btn" style="background: #3f6882;">Libérer</button>
+          </form>
+          <div id="game-5-feedback" class="error-msg"></div>
         </div>
       </section>
 
-      <!-- Div finale vide (architecture demandée) -->
+      <!-- Div finale vide (gardée pour l'architecture demandée) -->
       <div id="finale"></div>
-
     </div>
 
-    <!-- Logique JavaScript Pure (Vanilla JS) -->
+    <!-- ===================================================
+         MODAL DE VICTOIRE D'UNE PLUME
+         =================================================== -->
+    <div class="modal-overlay" id="victory-feather-modal">
+      <div class="modal-card">
+        <div style="width: 58px; height: 58px; background: #fff5e0; color: #b8863b; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; box-shadow: 0 0 20px rgba(212, 167, 84, 0.4);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path>
+            <line x1="16" y1="8" x2="2" y2="22"></line>
+            <line x1="17.5" y1="15" x2="9" y2="15"></line>
+          </svg>
+        </div>
+
+        <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: #b05252; background: #fdf0f0; padding: 4px 14px; border-radius: 999px; margin-bottom: 12px;">
+          Plume Magique Acquise !
+        </span>
+
+        <h2 id="victory-modal-title" style="font-family: var(--font-serif); font-size: 22px; color: var(--text-dark); margin-bottom: 6px;">
+          Félicitations Voyageuse !
+        </h2>
+
+        <p id="victory-modal-desc" style="font-family: var(--font-poetic); font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
+          Une nouvelle plume vient se poser dans ton Cabinet des Songes.
+        </p>
+
+        <div class="modal-buttons-group">
+          <button type="button" class="btn-primary-action" id="btn-modal-to-hub">
+            <span>Voir le Cabinet</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================
+         MODAL : RECOMMENCER / VOIR DEPUIS LE DÉBUT
+         (Fonctionnalité explicitement demandée par l'utilisateur)
+         =================================================== -->
+    <div class="modal-overlay" id="restart-choice-modal">
+      <div class="modal-card">
+        <h2 style="font-family: var(--font-serif); font-size: 22px; color: var(--text-dark); margin-bottom: 8px;">
+          Depuis le Début
+        </h2>
+        <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px;">
+          Que souhaitez-vous faire ? Votre progression actuelle est déjà précieusement enregistrée.
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 360px;">
+          <!-- Revoir sans perdre sa progression -->
+          <button type="button" class="btn-primary-action" id="btn-replay-intro-keep" style="justify-content: center;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            <span>Revoir la lettre & l'histoire</span>
+          </button>
+
+          <!-- Tout réinitialiser à zéro -->
+          <button type="button" class="btn-danger-action" id="btn-reset-all-progress" style="justify-content: center;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="1 4 1 10 7 10"></polyline>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+            </svg>
+            <span>Tout réinitialiser à zéro (0/5)</span>
+          </button>
+
+          <button type="button" class="btn-secondary-action" id="btn-cancel-restart" style="justify-content: center; margin-top: 4px;">
+            Annuler et continuer
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Logique JavaScript avec persistance LocalStorage & Navigation garantie sans écran vide -->
     <script>
       (function () {
         'use strict';
 
-        // --- Constantes & Thèmes de couleurs dynamiques ---
-        const THEME_COLORS = {
-          enveloppe: '#fdfbf7',
-          intro: '#fdfbf7',
-          hub: '#fadadd',
-          jeu1: '#fce8e8',
-          jeu2: '#7a8e82',
-          jeu3: '#7a4e55',
-          jeu4: '#dfd3c3',
-          jeu5: '#5e7788'
-        };
-
+        const STORAGE_KEY = 'quete_cinq_plumes_v2';
         const TARGET_WORD = 'RECAMIER';
         const MAX_ATTEMPTS = 6;
         const WORD_LENGTH = 8;
@@ -1640,13 +1835,58 @@
           'ENSEIGNE'
         ];
 
-        // --- État de l'Application ---
-        let attempts = [];
-        let currentInput = '';
-        let isGameOver = false;
-        let feather1Won = false;
+        const THEME_COLORS = {
+          enveloppe: '#fdfbf7',
+          intro: '#fdfbf7',
+          hub: '#f9e8eb',
+          jeu1: '#fdf1f1',
+          jeu2: '#eaf1ed',
+          jeu3: '#f3eaec',
+          jeu4: '#f7f1e7',
+          jeu5: '#eef3f6'
+        };
 
-        // --- Références DOM ---
+        // --- État de l'Application ---
+        let state = {
+          currentScreen: 'enveloppe',
+          feathers: { 1: false, 2: false, 3: false, 4: false, 5: false },
+          game1: {
+            attempts: [],
+            isWon: false,
+            isGameOver: false
+          }
+        };
+
+        // Charger l'état sauvegardé si disponible
+        function loadState() {
+          try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+              const saved = JSON.parse(raw);
+              state = Object.assign(state, saved);
+            }
+          } catch (e) {
+            console.warn('Erreur de lecture du stockage local', e);
+          }
+        }
+
+        // Sauvegarder automatiquement l'état
+        function saveState() {
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            flashSaveIndicator();
+          } catch (e) {
+            console.warn('Erreur d\'écriture du stockage local', e);
+          }
+        }
+
+        function flashSaveIndicator() {
+          const el = document.getElementById('save-indicator');
+          if (!el) return;
+          el.style.opacity = '1';
+        }
+
+        // Références DOM
         const screens = {
           enveloppe: document.getElementById('ecran-enveloppe'),
           intro: document.getElementById('ecran-intro'),
@@ -1658,132 +1898,229 @@
           jeu5: document.getElementById('jeu-5')
         };
 
-        const gridEl = document.getElementById('wordle-grid');
-        const inputEl = document.getElementById('word-input');
-        const formEl = document.getElementById('input-form');
-        const charCounterEl = document.getElementById('char-counter');
-        const errorMsgEl = document.getElementById('error-msg');
-        const clueZoneEl = document.getElementById('clue-zone');
-        const clueEmptyEl = document.getElementById('clue-empty');
-        const clueContentEl = document.getElementById('clue-content');
-        const clueNumberEl = document.getElementById('clue-number');
-        const clueTextEl = document.getElementById('clue-text');
-        const gameAreaEl = document.getElementById('game-area');
-        const gameOverScreenEl = document.getElementById('game-over-screen');
-        const restartBtn = document.getElementById('restart-btn');
-        const victoryModal = document.getElementById('victory-modal');
-        const victoryReplayBtn = document.getElementById('victory-replay-btn');
-        const victoryHubBtn = document.getElementById('victory-hub-btn');
-        const copyBtn = document.getElementById('copy-btn');
-        const coordsBox = document.getElementById('coords-box');
-        const copyToast = document.getElementById('copy-toast');
-        const keyEnterBtn = document.getElementById('key-enter');
-        const keyBackspaceBtn = document.getElementById('key-backspace');
-        const attemptCounterEl = document.getElementById('attempt-counter');
+        const navFeatherCount = document.getElementById('nav-feather-count');
+        const finalTreasureBanner = document.getElementById('final-treasure-banner');
+        const victoryModal = document.getElementById('victory-feather-modal');
+        const victoryModalTitle = document.getElementById('victory-modal-title');
+        const victoryModalDesc = document.getElementById('victory-modal-desc');
+        const restartModal = document.getElementById('restart-choice-modal');
 
-        // Navigation entre écrans avec transition douce
-        function navigateTo(screenKey) {
+        // Navigation fiable sans aucun état intermédiaire invisible
+        function navigateTo(screenKey, save = true) {
           const target = screens[screenKey];
           if (!target) return;
 
-          // Désactiver Vichy sauf si Game Over actif sur le jeu 1
-          document.body.classList.remove('game-over-vichy');
+          // Désactiver motif Vichy sauf si Game Over sur le jeu 1
+          if (screenKey !== 'jeu1' || !state.game1.isGameOver) {
+            document.body.classList.remove('game-over-vichy');
+          }
 
           // Transition de la couleur de fond
-          const targetColor = THEME_COLORS[screenKey] || '#fdfbf7';
-          document.body.style.backgroundColor = targetColor;
+          document.body.style.backgroundColor = THEME_COLORS[screenKey] || '#fdfbf7';
 
-          // Masquer tous les écrans
+          // Basculer l'affichage immédiatement
           Object.values(screens).forEach(screen => {
             if (screen) {
               screen.classList.remove('active');
             }
           });
+          target.classList.add('active');
 
-          // Activer l'écran cible
-          setTimeout(() => {
-            target.classList.add('active');
+          if (save) {
+            state.currentScreen = screenKey;
+            saveState();
+          }
 
-            if (screenKey === 'intro') {
-              startPoemAnimation();
-            } else if (screenKey === 'jeu1') {
-              if (!isGameOver) {
-                setTimeout(() => inputEl.focus(), 250);
+          // Remonter en haut de page pour le confort de lecture
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+
+          // Spécificités par écran
+          if (screenKey === 'jeu1') {
+            if (!state.game1.isWon && !state.game1.isGameOver) {
+              const input = document.getElementById('word-input');
+              if (input) setTimeout(() => input.focus(), 200);
+            }
+          }
+        }
+
+        function updateFeathersUI() {
+          let count = 0;
+          for (let i = 1; i <= 5; i++) {
+            const isWon = !!state.feathers[i];
+            if (isWon) count++;
+
+            const slot = document.getElementById(`slot-game-${i}`);
+            const badge = document.getElementById(`badge-game-${i}`);
+
+            if (slot) {
+              if (isWon) {
+                slot.classList.add('completed');
+              } else {
+                slot.classList.remove('completed');
               }
             }
-          }, 150);
+
+            if (badge) {
+              if (isWon) {
+                badge.textContent = 'Plume Acquise ✓';
+                badge.className = 'feather-status-badge badge-completed';
+              } else {
+                badge.textContent = i === 1 ? 'Commencer' : 'Explorer';
+                badge.className = 'feather-status-badge badge-unlocked';
+              }
+            }
+          }
+
+          if (navFeatherCount) {
+            navFeatherCount.textContent = `${count}/5 Plumes`;
+          }
+
+          if (finalTreasureBanner) {
+            if (count === 5) {
+              finalTreasureBanner.classList.add('visible');
+            } else {
+              finalTreasureBanner.classList.remove('visible');
+            }
+          }
+        }
+
+        function grantFeather(number, title, message) {
+          state.feathers[number] = true;
+          updateFeathersUI();
+          saveState();
+
+          if (victoryModalTitle) victoryModalTitle.textContent = title;
+          if (victoryModalDesc) victoryModalDesc.textContent = message;
+          if (victoryModal) victoryModal.style.display = 'flex';
         }
 
         // ===================================================
-        // ÉTAPE A : OUVERTURE DE L'ENVELOPPE
+        // GESTION DU BOUTON "VOIR DEPUIS LE DÉBUT"
         // ===================================================
+        const btnShowRestartModal = document.getElementById('btn-show-restart-modal');
+        const btnCancelRestart = document.getElementById('btn-cancel-restart');
+        const btnReplayIntroKeep = document.getElementById('btn-replay-intro-keep');
+        const btnResetAllProgress = document.getElementById('btn-reset-all-progress');
+
+        btnShowRestartModal.addEventListener('click', () => {
+          restartModal.style.display = 'flex';
+        });
+
+        btnCancelRestart.addEventListener('click', () => {
+          restartModal.style.display = 'none';
+        });
+
+        // 1. Revoir l'histoire depuis le début sans perdre ses plumes
+        btnReplayIntroKeep.addEventListener('click', () => {
+          restartModal.style.display = 'none';
+          resetEnvelopeVisuals();
+          navigateTo('enveloppe');
+        });
+
+        // 2. Tout réinitialiser à zéro
+        btnResetAllProgress.addEventListener('click', () => {
+          state = {
+            currentScreen: 'enveloppe',
+            feathers: { 1: false, 2: false, 3: false, 4: false, 5: false },
+            game1: { attempts: [], isWon: false, isGameOver: false }
+          };
+          saveState();
+          updateFeathersUI();
+          restartGame1();
+          resetEnvelopeVisuals();
+          restartModal.style.display = 'none';
+          navigateTo('enveloppe');
+        });
+
+        function resetEnvelopeVisuals() {
+          const flap = document.getElementById('envelope-flap');
+          const envWrapper = document.getElementById('btn-open-envelope');
+          if (flap) flap.style.transform = 'rotateX(0deg)';
+          if (envWrapper) {
+            envWrapper.style.opacity = '1';
+            envWrapper.style.transform = 'none';
+          }
+        }
+
+        // Clic sur l'enveloppe
         const btnOpenEnvelope = document.getElementById('btn-open-envelope');
+        const btnOpenDirect = document.getElementById('btn-open-direct');
         const envelopeFlap = document.getElementById('envelope-flap');
 
-        btnOpenEnvelope.addEventListener('click', function () {
+        function triggerOpenEnvelope() {
           if (envelopeFlap) {
             envelopeFlap.style.transform = 'rotateX(180deg)';
           }
-          btnOpenEnvelope.style.opacity = '0';
-          btnOpenEnvelope.style.transform = 'translateY(-14px)';
-
           setTimeout(() => {
             navigateTo('intro');
-          }, 600);
-        });
+          }, 450);
+        }
 
-        btnOpenEnvelope.addEventListener('keydown', function (e) {
+        btnOpenEnvelope.addEventListener('click', triggerOpenEnvelope);
+        btnOpenDirect.addEventListener('click', triggerOpenEnvelope);
+        btnOpenEnvelope.addEventListener('keydown', (e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            btnOpenEnvelope.click();
+            triggerOpenEnvelope();
           }
         });
 
-        // ===================================================
-        // ÉTAPE B : INTRODUCTION POÉTIQUE LIGNE PAR LIGNE
-        // ===================================================
-        function startPoemAnimation() {
-          const lines = document.querySelectorAll('.poem-line');
-          const btnQuest = document.getElementById('btn-start-quest');
-
-          lines.forEach((line, index) => {
-            setTimeout(() => {
-              line.classList.add('visible');
-            }, 300 + index * 750);
-          });
-
-          setTimeout(() => {
-            if (btnQuest) btnQuest.classList.add('visible');
-          }, 300 + lines.length * 750);
-        }
-
-        const btnStartQuest = document.getElementById('btn-start-quest');
-        btnStartQuest.addEventListener('click', function () {
+        // Clic sur "Entrer dans le Cabinet" (Écran Intro)
+        document.getElementById('btn-start-quest').addEventListener('click', () => {
           navigateTo('hub');
         });
 
-        // ===================================================
-        // ÉTAPE C : HUB CENTRAL (5 JEUX)
-        // ===================================================
+        // Navigation rapide en haut
+        document.getElementById('nav-brand-title').addEventListener('click', () => {
+          navigateTo('hub');
+        });
+        document.getElementById('nav-hub-btn').addEventListener('click', () => {
+          navigateTo('hub');
+        });
+
+        // Accès aux jeux depuis le Hub
         document.getElementById('slot-game-1').addEventListener('click', () => navigateTo('jeu1'));
         document.getElementById('slot-game-2').addEventListener('click', () => navigateTo('jeu2'));
         document.getElementById('slot-game-3').addEventListener('click', () => navigateTo('jeu3'));
         document.getElementById('slot-game-4').addEventListener('click', () => navigateTo('jeu4'));
         document.getElementById('slot-game-5').addEventListener('click', () => navigateTo('jeu5'));
 
-        ['1', '2', '3', '4', '5'].forEach(id => {
-          const btn = document.getElementById(`btn-back-hub-${id}`);
-          if (btn) {
-            btn.addEventListener('click', () => navigateTo('hub'));
-          }
+        // Boutons retour au Hub
+        for (let i = 1; i <= 5; i++) {
+          const b = document.getElementById(`btn-back-hub-${i}`);
+          if (b) b.addEventListener('click', () => navigateTo('hub'));
+        }
+
+        document.getElementById('btn-modal-to-hub').addEventListener('click', () => {
+          if (victoryModal) victoryModal.style.display = 'none';
+          navigateTo('hub');
+        });
+
+        document.getElementById('btn-view-epilogue').addEventListener('click', () => {
+          alert('Félicitations pour avoir réuni les 5 plumes de la Quête ! La carte du trésor au cœur de la France est désormais gravée dans vos songes.');
         });
 
         // ===================================================
-        // ÉTAPE D : JEU 1 (BOUTIQUE WORDLE RECAMIER)
+        // JEU 1 : LA BOUTIQUE DE LOUISE (WORDLE RECAMIER)
         // ===================================================
+        const gridEl = document.getElementById('wordle-grid');
+        const inputEl = document.getElementById('word-input');
+        const formEl = document.getElementById('input-form');
+        const charCounterEl = document.getElementById('char-counter');
+        const errorMsgEl = document.getElementById('error-msg');
+        const clueEmptyEl = document.getElementById('clue-empty');
+        const clueContentEl = document.getElementById('clue-content');
+        const clueNumberEl = document.getElementById('clue-number');
+        const clueTextEl = document.getElementById('clue-text');
+        const attemptCounterEl = document.getElementById('attempt-counter');
+        const gameAreaEl = document.getElementById('game-area');
+        const gameOverScreenEl = document.getElementById('game-over-screen');
+        const restartGameBtn = document.getElementById('restart-game-btn');
+
+        let currentInput = '';
 
         function normalize(word) {
-          return word
+          return (word || '')
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
             .toUpperCase()
@@ -1804,10 +2141,37 @@
             }
             gridEl.appendChild(rowEl);
           }
+
+          // Restaurer les tentatives sauvegardées
+          if (state.game1.attempts && state.game1.attempts.length > 0) {
+            state.game1.attempts.forEach((guess, rIndex) => {
+              const evalRes = evaluateGuess(guess, TARGET_WORD);
+              for (let c = 0; c < WORD_LENGTH; c++) {
+                const tile = document.getElementById(`tile-${rIndex}-${c}`);
+                if (tile) {
+                  tile.textContent = guess[c];
+                  tile.className = `wordle-tile ${evalRes[c]}`;
+                  updateKeyboardKey(guess[c], evalRes[c]);
+                }
+              }
+            });
+
+            updateClue();
+
+            if (attemptCounterEl) {
+              attemptCounterEl.textContent = Math.min(state.game1.attempts.length + 1, MAX_ATTEMPTS);
+            }
+
+            if (state.game1.isWon) {
+              inputEl.disabled = true;
+            } else if (state.game1.isGameOver) {
+              triggerGameOverVichy();
+            }
+          }
         }
 
         function renderCurrentRow() {
-          const rowIndex = attempts.length;
+          const rowIndex = state.game1.attempts.length;
           if (rowIndex >= MAX_ATTEMPTS) return;
 
           const norm = normalize(currentInput);
@@ -1834,7 +2198,6 @@
             targetCounts[char] = (targetCounts[char] || 0) + 1;
           }
 
-          // Passe 1 : bien placées
           for (let i = 0; i < WORD_LENGTH; i++) {
             if (guess[i] === target[i]) {
               result[i] = 'correct';
@@ -1842,7 +2205,6 @@
             }
           }
 
-          // Passe 2 : mal placées
           for (let i = 0; i < WORD_LENGTH; i++) {
             if (result[i] !== 'correct') {
               const char = guess[i];
@@ -1854,19 +2216,6 @@
           }
 
           return result;
-        }
-
-        function revealRow(rowIndex, guess, evaluation) {
-          for (let c = 0; c < WORD_LENGTH; c++) {
-            const tile = document.getElementById(`tile-${rowIndex}-${c}`);
-            if (!tile) continue;
-            tile.textContent = guess[c];
-
-            setTimeout(() => {
-              tile.className = `wordle-tile ${evaluation[c]}`;
-              updateKeyboardKey(guess[c], evaluation[c]);
-            }, c * 80);
-          }
         }
 
         function updateKeyboardKey(letter, status) {
@@ -1883,120 +2232,91 @@
         }
 
         function updateClue() {
-          const failedCount = attempts.length;
-          if (failedCount > 0 && failedCount <= CLUES.length) {
+          const count = state.game1.attempts.length;
+          if (count > 0 && count <= CLUES.length) {
             clueEmptyEl.style.display = 'none';
             clueContentEl.style.display = 'block';
-            clueNumberEl.textContent = `Indice n°${failedCount}`;
-            clueTextEl.textContent = CLUES[failedCount - 1];
-          } else if (failedCount === 0) {
+            clueNumberEl.textContent = `Indice n°${count}`;
+            clueTextEl.textContent = CLUES[count - 1];
+          } else if (count === 0) {
             clueEmptyEl.style.display = 'block';
             clueContentEl.style.display = 'none';
           }
         }
 
         function submitGuess() {
-          if (isGameOver) return;
-          showError('');
+          if (state.game1.isWon || state.game1.isGameOver) return;
+          errorMsgEl.textContent = '';
 
-          const normalizedGuess = normalize(currentInput);
-
-          if (normalizedGuess.length !== WORD_LENGTH) {
-            showError(`Le mot doit comporter exactement ${WORD_LENGTH} lettres.`);
-            inputEl.style.transform = 'translateX(-4px)';
-            setTimeout(() => (inputEl.style.transform = 'translateX(4px)'), 60);
-            setTimeout(() => (inputEl.style.transform = 'translateX(0)'), 120);
+          const guess = normalize(currentInput);
+          if (guess.length !== WORD_LENGTH) {
+            errorMsgEl.textContent = `Le mot doit comporter exactement ${WORD_LENGTH} lettres.`;
             return;
           }
 
-          const rowIndex = attempts.length;
-          const evaluation = evaluateGuess(normalizedGuess, TARGET_WORD);
-          attempts.push(normalizedGuess);
+          const rowIndex = state.game1.attempts.length;
+          const evaluation = evaluateGuess(guess, TARGET_WORD);
 
-          revealRow(rowIndex, normalizedGuess, evaluation);
+          for (let c = 0; c < WORD_LENGTH; c++) {
+            const tile = document.getElementById(`tile-${rowIndex}-${c}`);
+            if (tile) {
+              tile.textContent = guess[c];
+              tile.className = `wordle-tile ${evaluation[c]}`;
+              updateKeyboardKey(guess[c], evaluation[c]);
+            }
+          }
+
+          state.game1.attempts.push(guess);
           currentInput = '';
           inputEl.value = '';
           charCounterEl.textContent = `0/${WORD_LENGTH}`;
 
-          // Mettre à jour le compteur
-          if (attemptCounterEl && attempts.length < MAX_ATTEMPTS) {
-            attemptCounterEl.textContent = attempts.length + 1;
+          if (attemptCounterEl && state.game1.attempts.length < MAX_ATTEMPTS) {
+            attemptCounterEl.textContent = state.game1.attempts.length + 1;
           }
 
-          // Victoire
-          if (normalizedGuess === TARGET_WORD) {
-            isGameOver = true;
-            feather1Won = true;
+          if (guess === TARGET_WORD) {
+            state.game1.isWon = true;
             inputEl.disabled = true;
-            markFeatherWonInHub();
-
+            saveState();
             setTimeout(() => {
-              victoryModal.style.display = 'flex';
-            }, WORD_LENGTH * 80 + 300);
+              grantFeather(1, 'Plume d\'Or de la Littérature', 'Bravo ! Tu as percé le mot secret RECAMIER (Square & Rue Juliette Récamier - 75007 Paris).');
+            }, 600);
             return;
           }
 
-          setTimeout(() => {
-            updateClue();
-          }, WORD_LENGTH * 80 + 100);
+          updateClue();
 
-          // Échec après 6 tentatives (Game Over Vichy)
-          if (attempts.length >= MAX_ATTEMPTS) {
-            isGameOver = true;
+          if (state.game1.attempts.length >= MAX_ATTEMPTS) {
+            state.game1.isGameOver = true;
             inputEl.disabled = true;
-            setTimeout(() => {
-              triggerGameOverVichy();
-            }, WORD_LENGTH * 80 + 400);
+            saveState();
+            setTimeout(triggerGameOverVichy, 600);
+          } else {
+            saveState();
           }
         }
 
         function triggerGameOverVichy() {
           document.body.classList.add('game-over-vichy');
-          gameAreaEl.style.opacity = '0';
-          setTimeout(() => {
-            gameAreaEl.style.display = 'none';
-            gameOverScreenEl.style.display = 'block';
-          }, 400);
+          if (gameAreaEl) gameAreaEl.style.display = 'none';
+          if (gameOverScreenEl) gameOverScreenEl.style.display = 'block';
         }
 
-        function markFeatherWonInHub() {
-          const badge1 = document.getElementById('badge-game-1');
-          const iconWrap1 = document.getElementById('feather-icon-1');
-          const slot1 = document.getElementById('slot-game-1');
-
-          if (badge1) {
-            badge1.textContent = 'Plume obtenue';
-            badge1.className = 'feather-status-badge badge-completed';
-          }
-          if (iconWrap1) {
-            iconWrap1.style.background = '#fbf0d9';
-            iconWrap1.style.color = '#c99332';
-          }
-          if (slot1) {
-            slot1.classList.add('completed');
-          }
-        }
-
-        function restartGame() {
-          attempts = [];
-          currentInput = '';
-          isGameOver = false;
+        function restartGame1() {
+          state.game1 = { attempts: [], isWon: false, isGameOver: false };
+          saveState();
 
           document.body.classList.remove('game-over-vichy');
-          document.body.style.backgroundColor = THEME_COLORS.jeu1;
-
-          victoryModal.style.display = 'none';
-          gameOverScreenEl.style.display = 'none';
-          gameAreaEl.style.display = 'flex';
-          setTimeout(() => {
-            gameAreaEl.style.opacity = '1';
-          }, 50);
+          if (gameOverScreenEl) gameOverScreenEl.style.display = 'none';
+          if (gameAreaEl) gameAreaEl.style.display = 'flex';
 
           inputEl.disabled = false;
           inputEl.value = '';
+          currentInput = '';
           charCounterEl.textContent = `0/${WORD_LENGTH}`;
           if (attemptCounterEl) attemptCounterEl.textContent = '1';
-          showError('');
+          errorMsgEl.textContent = '';
 
           updateClue();
 
@@ -2007,14 +2327,10 @@
           });
 
           initGrid();
-          setTimeout(() => inputEl.focus(), 150);
         }
 
-        function showError(msg) {
-          errorMsgEl.textContent = msg;
-        }
+        restartGameBtn.addEventListener('click', restartGame1);
 
-        // Événements d'entrée
         inputEl.addEventListener('input', (e) => {
           currentInput = e.target.value;
           renderCurrentRow();
@@ -2025,10 +2341,9 @@
           submitGuess();
         });
 
-        // Clics clavier virtuel
         document.querySelectorAll('.key-btn[data-key]').forEach(btn => {
           btn.addEventListener('click', () => {
-            if (isGameOver) return;
+            if (state.game1.isWon || state.game1.isGameOver) return;
             const letter = btn.getAttribute('data-key');
             if (normalize(currentInput).length < WORD_LENGTH) {
               currentInput += letter;
@@ -2038,22 +2353,22 @@
           });
         });
 
-        keyBackspaceBtn.addEventListener('click', () => {
-          if (isGameOver) return;
+        document.getElementById('key-backspace').addEventListener('click', () => {
+          if (state.game1.isWon || state.game1.isGameOver) return;
           currentInput = currentInput.slice(0, -1);
           inputEl.value = currentInput;
           renderCurrentRow();
         });
 
-        keyEnterBtn.addEventListener('click', () => {
+        document.getElementById('key-enter').addEventListener('click', () => {
           submitGuess();
         });
 
-        // Touches physiques sur le clavier
+        // Clavier physique universel
         document.addEventListener('keydown', (e) => {
           if (screens.jeu1 && !screens.jeu1.classList.contains('active')) return;
           if (document.activeElement === inputEl) return;
-          if (isGameOver) return;
+          if (state.game1.isWon || state.game1.isGameOver) return;
 
           if (e.key === 'Enter') {
             e.preventDefault();
@@ -2073,54 +2388,112 @@
           }
         });
 
-        // Copie des coordonnées GPS avec animation Toast
-        function triggerCopy() {
-          const coords = COORDINATES;
-          const showToast = () => {
-            copyToast.classList.add('visible');
-            setTimeout(() => {
-              copyToast.classList.remove('visible');
-            }, 2000);
-          };
-
+        // Copier les coordonnées GPS
+        const coordsBox = document.getElementById('coords-box');
+        const copyToast = document.getElementById('copy-toast');
+        function copyCoords() {
           if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(coords).then(showToast).catch(() => fallbackCopy(coords));
-          } else {
-            fallbackCopy(coords);
-          }
-
-          function fallbackCopy(text) {
-            const ta = document.createElement('textarea');
-            ta.value = text;
-            document.body.appendChild(ta);
-            ta.select();
-            try {
-              document.execCommand('copy');
-              showToast();
-            } catch (err) {
-              console.warn('Copie manuelle', err);
-            }
-            document.body.removeChild(ta);
+            navigator.clipboard.writeText(COORDINATES).then(() => {
+              copyToast.classList.add('visible');
+              setTimeout(() => copyToast.classList.remove('visible'), 2000);
+            });
           }
         }
+        coordsBox.addEventListener('click', copyCoords);
 
-        copyBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          triggerCopy();
+        // ===================================================
+        // JEU 2 : L'APOTHICAIRE
+        // ===================================================
+        document.querySelectorAll('.option-btn[data-game="2"]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const choice = btn.getAttribute('data-choice');
+            const feedback = document.getElementById('game-2-feedback');
+            if (choice === 'sauge') {
+              btn.classList.add('selected-correct');
+              feedback.style.color = '#387845';
+              feedback.textContent = 'Victoire ! La Sauge purificatrice apaise les âmes.';
+              setTimeout(() => {
+                grantFeather(2, 'Plume d\'Émeraude Sauvage', 'Tu as trouvé le remède purificateur de l\'Officine. La deuxième plume rejoint ton Cabinet !');
+              }, 700);
+            } else {
+              feedback.style.color = '#b83e3e';
+              feedback.textContent = 'Cette plante n\'apporte pas la sérénité requise. Relis attentivement le vers.';
+            }
+          });
         });
 
-        coordsBox.addEventListener('click', triggerCopy);
-
-        // Boutons de victoires et reprise
-        restartBtn.addEventListener('click', restartGame);
-        victoryReplayBtn.addEventListener('click', restartGame);
-        victoryHubBtn.addEventListener('click', () => {
-          victoryModal.style.display = 'none';
-          navigateTo('hub');
+        // ===================================================
+        // JEU 3 : DOSTOÏEVSKI
+        // ===================================================
+        document.getElementById('form-game-3').addEventListener('submit', (e) => {
+          e.preventDefault();
+          const val = normalize(document.getElementById('input-game-3').value);
+          const feedback = document.getElementById('game-3-feedback');
+          if (val === 'BEAUTE') {
+            feedback.style.color = '#387845';
+            feedback.textContent = '« La Beauté sauvera le monde. » Sublime réponse !';
+            setTimeout(() => {
+              grantFeather(3, 'Plume Pourpre des Songes', 'La plume lourde de Dostoïevski s\'illumine. La troisième plume est à toi !');
+            }, 700);
+          } else {
+            feedback.style.color = '#b83e3e';
+            feedback.textContent = 'Ce n\'est pas le mot de la prophétie. Pense à ce qui émerveille le regard (6 lettres).';
+          }
         });
 
-        // Initialisation initiale de la grille
+        // ===================================================
+        // JEU 4 : PETIT PRINCE
+        // ===================================================
+        document.querySelectorAll('.option-btn[data-game="4"]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const choice = btn.getAttribute('data-choice');
+            const feedback = document.getElementById('game-4-feedback');
+            if (choice === 'B612') {
+              btn.classList.add('selected-correct');
+              feedback.style.color = '#387845';
+              feedback.textContent = 'L\'astéroïde B-612 ! Là où la rose fleurit chaque matin.';
+              setTimeout(() => {
+                grantFeather(4, 'Plume Stellaire', 'Le rire de l\'enfant résonne dans les étoiles. La quatrième plume est acquise !');
+              }, 700);
+            } else {
+              feedback.style.color = '#b83e3e';
+              feedback.textContent = 'Ce n\'est pas l\'astre où vit la petite rose.';
+            }
+          });
+        });
+
+        // ===================================================
+        // JEU 5 : LE CYGNE
+        // ===================================================
+        document.getElementById('form-game-5').addEventListener('submit', (e) => {
+          e.preventDefault();
+          const val = normalize(document.getElementById('input-game-5').value);
+          const feedback = document.getElementById('game-5-feedback');
+          if (val === 'CYGNE') {
+            feedback.style.color = '#387845';
+            feedback.textContent = 'Le Cygne royal déploie ses ailes sur la grève.';
+            setTimeout(() => {
+              grantFeather(5, 'Plume d\'Argent des Eaux', 'Les eaux calmes s\'ouvrent. Tu possèdes maintenant les cinq plumes !');
+            }, 700);
+          } else {
+            feedback.style.color = '#b83e3e';
+            feedback.textContent = 'Ce n\'est pas l\'anagramme correct des lettres G-N-C-Y-E.';
+          }
+        });
+
+        // ===================================================
+        // DÉMARRAGE & RESTAURATION
+        // ===================================================
+        loadState();
+        updateFeathersUI();
         initGrid();
+
+        // Si l'utilisateur avait une partie en cours, restaurer son écran (hub ou jeu), sinon enveloppe
+        if (state.currentScreen && screens[state.currentScreen] && state.currentScreen !== 'enveloppe') {
+          navigateTo(state.currentScreen, false);
+        } else {
+          navigateTo('enveloppe', false);
+        }
 
       })();
     </script>
