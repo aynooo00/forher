@@ -1948,29 +1948,6 @@
         </div>
 
         <main class="game-area" id="game-area">
-          <!-- Bannière magique des lettres dansantes activée après recommencement -->
-          <div class="dancing-letters-banner" id="dancing-letters-banner" aria-live="polite">
-            <div class="dancing-banner-header">
-              <span>✨</span>
-              <span>Une main magique fait danser les bonnes lettres :</span>
-              <span>✨</span>
-            </div>
-
-            <!-- Alphabet complet où les lettres de RECAMIER dansent -->
-            <div class="full-alphabet-deck" id="banner-alphabet-deck"></div>
-
-            <div class="dancing-letters-row" aria-label="Lettres secrètes dansantes : RECAMIER">
-              <div class="dancing-tile" style="--delay: 0.0s">R</div>
-              <div class="dancing-tile" style="--delay: 0.15s">E</div>
-              <div class="dancing-tile" style="--delay: 0.3s">C</div>
-              <div class="dancing-tile" style="--delay: 0.45s">A</div>
-              <div class="dancing-tile" style="--delay: 0.6s">M</div>
-              <div class="dancing-tile" style="--delay: 0.75s">I</div>
-              <div class="dancing-tile" style="--delay: 0.9s">E</div>
-              <div class="dancing-tile" style="--delay: 1.05s">R</div>
-            </div>
-          </div>
-
           <div class="wordle-grid" id="wordle-grid" aria-label="Grille Wordle de 8 lettres"></div>
 
           <div class="clue-zone" id="clue-zone">
@@ -2039,7 +2016,7 @@
           </div>
         </main>
 
-        <!-- Écran / Carte d'échec intégrée avec animation fluide et alphabet complet -->
+        <!-- Écran / Carte d'échec intégrée : juste le texte poétique et le bouton recommencer -->
         <section class="game-over-screen" id="game-over-screen" aria-live="assertive">
           <div class="game-over-card">
             <div style="font-size: 26px; margin-bottom: 2px;">🥀</div>
@@ -2047,23 +2024,8 @@
               Une brise magique s'éveille...
             </h2>
             <p class="game-over-poetic-text">
-              Les six tentatives sont épuisées, une main magique fais danser les bonnes lettres
+              Les six tentatives sont épuisées, mais une brise magique s'éveille pour guider vos pas...
             </p>
-
-            <!-- Alphabet complet : Toutes les lettres affichées, RECAMIER qui dansent -->
-            <div class="full-alphabet-deck" id="game-over-alphabet-deck" aria-label="Alphabet complet montrant les lettres de RECAMIER qui dansent"></div>
-
-            <!-- Mot secret assemblé en lettres dansantes -->
-            <div class="dancing-letters-row" style="margin: 10px 0 16px;" aria-label="Mot secret en mouvement">
-              <div class="dancing-tile" style="--delay: 0.0s">R</div>
-              <div class="dancing-tile" style="--delay: 0.15s">E</div>
-              <div class="dancing-tile" style="--delay: 0.3s">C</div>
-              <div class="dancing-tile" style="--delay: 0.45s">A</div>
-              <div class="dancing-tile" style="--delay: 0.6s">M</div>
-              <div class="dancing-tile" style="--delay: 0.75s">I</div>
-              <div class="dancing-tile" style="--delay: 0.9s">E</div>
-              <div class="dancing-tile" style="--delay: 1.05s">R</div>
-            </div>
 
             <button type="button" class="restart-btn" id="restart-game-btn">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2853,9 +2815,32 @@
         const gameOverScreenEl = document.getElementById('game-over-screen');
         const restartGameBtn = document.getElementById('restart-game-btn');
         const virtualKeyboardEl = document.getElementById('virtual-keyboard');
-        const dancingLettersBannerEl = document.getElementById('dancing-letters-banner');
 
         let currentInput = '';
+
+        // Lettres qui composent le mot secret (sans jamais l'écrire en clair)
+        const SECRET_KEYBOARD_LETTERS = {
+          'R': '0.0s',
+          'E': '0.2s',
+          'C': '0.4s',
+          'A': '0.6s',
+          'M': '0.8s',
+          'I': '1.0s'
+        };
+
+        function applyKeyboardDancingState() {
+          const shouldDance = state.game1.hasDancingLetters && !state.game1.isWon && !state.game1.isGameOver;
+          document.querySelectorAll('.key-btn[data-key]').forEach(btn => {
+            const k = btn.getAttribute('data-key');
+            if (shouldDance && SECRET_KEYBOARD_LETTERS[k]) {
+              btn.classList.add('key-dancing-hint');
+              btn.style.setProperty('--delay', SECRET_KEYBOARD_LETTERS[k]);
+            } else {
+              btn.classList.remove('key-dancing-hint');
+              btn.style.removeProperty('--delay');
+            }
+          });
+        }
 
         function normalize(word) {
           return (word || '')
@@ -2907,24 +2892,8 @@
             }
           }
 
-          // Afficher la bannière des lettres magiques dansantes si l'épreuve a été recommencée après échec
-          if (state.game1.hasDancingLetters && !state.game1.isWon && !state.game1.isGameOver) {
-            if (dancingLettersBannerEl) {
-              dancingLettersBannerEl.classList.add('visible');
-              const bannerDeck = document.getElementById('banner-alphabet-deck');
-              if (bannerDeck) buildAlphabetDeck(bannerDeck);
-            }
-            const secretLetters = { 'R': '0.0s', 'E': '0.18s', 'C': '0.36s', 'A': '0.54s', 'M': '0.72s', 'I': '0.90s' };
-            document.querySelectorAll('.key-btn[data-key]').forEach(btn => {
-              const k = btn.getAttribute('data-key');
-              if (secretLetters[k]) {
-                btn.className = 'key-btn key-dancing-hint';
-                btn.style.setProperty('--delay', secretLetters[k]);
-              }
-            });
-          } else {
-            if (dancingLettersBannerEl) dancingLettersBannerEl.classList.remove('visible');
-          }
+          // Faire danser les lettres du mot uniquement sur le clavier virtuel après échec
+          applyKeyboardDancingState();
         }
 
         function renderCurrentRow() {
@@ -2979,12 +2948,18 @@
           const keyBtn = document.querySelector(`.key-btn[data-key="${letter}"]`);
           if (!keyBtn) return;
 
+          const hasDance = keyBtn.classList.contains('key-dancing-hint');
+
           if (status === 'correct') {
             keyBtn.className = 'key-btn key-correct';
           } else if (status === 'present' && !keyBtn.classList.contains('key-correct')) {
             keyBtn.className = 'key-btn key-present';
           } else if (status === 'absent' && !keyBtn.classList.contains('key-correct') && !keyBtn.classList.contains('key-present')) {
             keyBtn.className = 'key-btn key-absent';
+          }
+
+          if (hasDance) {
+            keyBtn.classList.add('key-dancing-hint');
           }
         }
 
@@ -2999,34 +2974,6 @@
             clueEmptyEl.style.display = 'block';
             clueContentEl.style.display = 'none';
           }
-        }
-
-        function buildAlphabetDeck(containerEl) {
-          if (!containerEl) return;
-          containerEl.innerHTML = '';
-          const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-          const SECRET_SET = new Set(['R', 'E', 'C', 'A', 'M', 'I']);
-          const DELAY_MAP = {
-            'R': '0.0s',
-            'E': '0.18s',
-            'C': '0.36s',
-            'A': '0.54s',
-            'M': '0.72s',
-            'I': '0.90s'
-          };
-
-          ALPHABET.forEach(char => {
-            const tile = document.createElement('div');
-            if (SECRET_SET.has(char)) {
-              tile.className = 'alphabet-tile is-dancing-secret';
-              tile.style.setProperty('--delay', DELAY_MAP[char] || '0.2s');
-              tile.setAttribute('title', `Lettre secrète dansante : ${char}`);
-            } else {
-              tile.className = 'alphabet-tile is-static-letter';
-            }
-            tile.textContent = char;
-            containerEl.appendChild(tile);
-          });
         }
 
         function submitGuess() {
@@ -3064,6 +3011,12 @@
             state.game1.isWon = true;
             inputEl.disabled = true;
             saveState();
+
+            // Stopper la danse des touches après victoire
+            document.querySelectorAll('.key-dancing-hint').forEach(btn => {
+              btn.classList.remove('key-dancing-hint');
+              btn.style.removeProperty('--delay');
+            });
 
             // Changement doux de la couleur de fond vers un doré triomphant
             document.body.style.backgroundColor = '#faf3e6';
@@ -3103,15 +3056,11 @@
           if (clueZoneEl) clueZoneEl.style.display = 'none';
           if (gameOverScreenEl) {
             gameOverScreenEl.style.display = 'block';
-            // Remplir l'alphabet complet montrant toutes les 26 lettres avec celles de RECAMIER qui dansent
-            const deck = document.getElementById('game-over-alphabet-deck');
-            if (deck) buildAlphabetDeck(deck);
           }
-          if (dancingLettersBannerEl) dancingLettersBannerEl.classList.remove('visible');
         }
 
         function restartGame1(enableDancingLetters = true) {
-          // Lors du recommencement après épuisement des essais, activer la danse des lettres de RECAMIER
+          // Lors du recommencement après échec : les touches dansent UNIQUEMENT sur le clavier virtuel
           state.game1 = {
             attempts: [],
             isWon: false,
@@ -3128,34 +3077,14 @@
           if (virtualKeyboardEl) virtualKeyboardEl.style.display = 'flex';
           if (clueZoneEl) clueZoneEl.style.display = 'block';
 
-          // Faire bouger/danser les lettres de RECAMIER au-dessus de la grille et sur le clavier
-          if (enableDancingLetters) {
-            if (dancingLettersBannerEl) {
-              dancingLettersBannerEl.classList.add('visible');
-              const bannerDeck = document.getElementById('banner-alphabet-deck');
-              if (bannerDeck) buildAlphabetDeck(bannerDeck);
+          // Réinitialiser les touches du clavier virtuel et activer la danse des lettres magiques
+          document.querySelectorAll('.key-btn').forEach(btn => {
+            if (!btn.classList.contains('action-key')) {
+              btn.className = 'key-btn';
+              btn.style.removeProperty('--delay');
             }
-            // Clavier virtuel : faire danser les touches R, E, C, A, M, I
-            const secretLetters = { 'R': '0.0s', 'E': '0.18s', 'C': '0.36s', 'A': '0.54s', 'M': '0.72s', 'I': '0.90s' };
-            document.querySelectorAll('.key-btn[data-key]').forEach(btn => {
-              const k = btn.getAttribute('data-key');
-              if (secretLetters[k]) {
-                btn.className = 'key-btn key-dancing-hint';
-                btn.style.setProperty('--delay', secretLetters[k]);
-              } else {
-                btn.className = 'key-btn';
-                btn.style.removeProperty('--delay');
-              }
-            });
-          } else {
-            if (dancingLettersBannerEl) dancingLettersBannerEl.classList.remove('visible');
-            document.querySelectorAll('.key-btn').forEach(btn => {
-              if (!btn.classList.contains('action-key')) {
-                btn.className = 'key-btn';
-                btn.style.removeProperty('--delay');
-              }
-            });
-          }
+          });
+          applyKeyboardDancingState();
 
           inputEl.disabled = false;
           inputEl.value = '';
