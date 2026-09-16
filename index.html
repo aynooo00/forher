@@ -191,11 +191,11 @@
         min-height: calc(100vh - 60px);
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
         position: relative;
         z-index: 1;
-        padding: 16px;
+        padding: 16px 16px 40px;
       }
 
       /* Règle essentielle : Tout écran inactif est masqué, TOUT écran actif est visible en flex */
@@ -204,7 +204,7 @@
         display: none !important;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
         opacity: 0;
         transform: translateY(6px);
         transition: opacity 0.4s ease, transform 0.4s ease;
@@ -214,6 +214,12 @@
         display: flex !important;
         opacity: 1 !important;
         transform: translateY(0) !important;
+      }
+
+      /* Centrage vertical sécurisé pour les écrans courts */
+      #ecran-enveloppe.active,
+      #ecran-intro.active {
+        margin: auto 0;
       }
 
       /* ===================================================
@@ -861,13 +867,16 @@
       .wordle-grid {
         display: flex;
         flex-direction: column;
-        gap: 5px;
-        margin: 6px 0 10px;
+        gap: 6px;
+        margin: 8px 0 12px;
+        align-items: center;
+        width: 100%;
       }
 
       .wordle-row {
         display: flex;
-        gap: 5px;
+        gap: 6px;
+        justify-content: center;
       }
 
       .wordle-tile {
@@ -877,23 +886,35 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 19px;
+        font-size: 20px;
         font-weight: 700;
         text-transform: uppercase;
         user-select: none;
-        background: rgba(255, 255, 255, 0.7);
-        border: 1px solid var(--tile-border);
+        background: #ffffff;
+        border: 2px solid #dfc3c7;
         color: var(--text-dark);
-        box-shadow: 0 1px 3px rgba(60, 20, 20, 0.04);
-        transition: transform 0.15s ease, border-color 0.15s ease;
+        box-shadow: 0 1px 4px rgba(60, 20, 20, 0.05);
+        transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.2s ease;
       }
 
       @media (max-width: 480px) {
         .wordle-tile {
-          width: 36px;
+          width: 35px;
           height: 42px;
-          font-size: 16px;
+          font-size: 17px;
           border-radius: 6px;
+        }
+        .wordle-row, .wordle-grid {
+          gap: 4px;
+        }
+      }
+
+      @media (max-width: 360px) {
+        .wordle-tile {
+          width: 31px;
+          height: 38px;
+          font-size: 14px;
+          border-radius: 5px;
         }
         .wordle-row, .wordle-grid {
           gap: 3px;
@@ -2378,6 +2399,12 @@
           } catch (e) {
             console.warn('Erreur de lecture du stockage local', e);
           }
+          if (!state.game1) {
+            state.game1 = { attempts: [], isWon: false, isGameOver: false };
+          }
+          if (!Array.isArray(state.game1.attempts)) {
+            state.game1.attempts = [];
+          }
         }
 
         // Sauvegarder automatiquement l'état
@@ -2490,6 +2517,9 @@
 
           // Spécificités par écran
           if (screenKey === 'jeu1') {
+            if (gridEl && gridEl.children.length === 0) {
+              initGrid();
+            }
             if (!state.game1.isWon && !state.game1.isGameOver) {
               const input = document.getElementById('word-input');
               if (input) setTimeout(() => input.focus(), 350);
@@ -3243,14 +3273,18 @@
             const feedback = document.getElementById('game-2-feedback');
             if (choice === 'sauge') {
               btn.classList.add('selected-correct');
-              feedback.style.color = '#387845';
-              feedback.textContent = 'Victoire ! La Sauge purificatrice apaise les âmes.';
+              if (feedback) {
+                feedback.style.color = '#387845';
+                feedback.textContent = 'Victoire ! La Sauge purificatrice apaise les âmes.';
+              }
               setTimeout(() => {
                 grantFeather(2, 'Plume d\'Émeraude Sauvage', 'Tu as trouvé le remède purificateur de l\'Officine. La deuxième plume rejoint ton Cabinet !');
               }, 700);
             } else {
-              feedback.style.color = '#b83e3e';
-              feedback.textContent = 'Cette plante n\'apporte pas la sérénité requise. Relis attentivement le vers.';
+              if (feedback) {
+                feedback.style.color = '#b83e3e';
+                feedback.textContent = 'Cette plante n\'apporte pas la sérénité requise. Relis attentivement le vers.';
+              }
             }
           });
         });
@@ -3258,21 +3292,29 @@
         // ===================================================
         // JEU 3 : DOSTOÏEVSKI
         // ===================================================
-        document.getElementById('form-game-3').addEventListener('submit', (e) => {
-          e.preventDefault();
-          const val = normalize(document.getElementById('input-game-3').value);
-          const feedback = document.getElementById('game-3-feedback');
-          if (val === 'BEAUTE') {
-            feedback.style.color = '#387845';
-            feedback.textContent = '« La Beauté sauvera le monde. » Sublime réponse !';
-            setTimeout(() => {
-              grantFeather(3, 'Plume Pourpre des Songes', 'La plume lourde de Dostoïevski s\'illumine. La troisième plume est à toi !');
-            }, 700);
-          } else {
-            feedback.style.color = '#b83e3e';
-            feedback.textContent = 'Ce n\'est pas le mot de la prophétie. Pense à ce qui émerveille le regard (6 lettres).';
-          }
-        });
+        const formGame3 = document.getElementById('form-game-3');
+        if (formGame3) {
+          formGame3.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const input3 = document.getElementById('input-game-3');
+            const val = normalize(input3 ? input3.value : '');
+            const feedback = document.getElementById('game-3-feedback');
+            if (val === 'BEAUTE') {
+              if (feedback) {
+                feedback.style.color = '#387845';
+                feedback.textContent = '« La Beauté sauvera le monde. » Sublime réponse !';
+              }
+              setTimeout(() => {
+                grantFeather(3, 'Plume Pourpre des Songes', 'La plume lourde de Dostoïevski s\'illumine. La troisième plume est à toi !');
+              }, 700);
+            } else {
+              if (feedback) {
+                feedback.style.color = '#b83e3e';
+                feedback.textContent = 'Ce n\'est pas le mot de la prophétie. Pense à ce qui émerveille le regard (6 lettres).';
+              }
+            }
+          });
+        }
 
         // ===================================================
         // JEU 4 : PETIT PRINCE
@@ -3283,14 +3325,18 @@
             const feedback = document.getElementById('game-4-feedback');
             if (choice === 'B612') {
               btn.classList.add('selected-correct');
-              feedback.style.color = '#387845';
-              feedback.textContent = 'L\'astéroïde B-612 ! Là où la rose fleurit chaque matin.';
+              if (feedback) {
+                feedback.style.color = '#387845';
+                feedback.textContent = 'L\'astéroïde B-612 ! Là où la rose fleurit chaque matin.';
+              }
               setTimeout(() => {
                 grantFeather(4, 'Plume Stellaire', 'Le rire de l\'enfant résonne dans les étoiles. La quatrième plume est acquise !');
               }, 700);
             } else {
-              feedback.style.color = '#b83e3e';
-              feedback.textContent = 'Ce n\'est pas l\'astre où vit la petite rose.';
+              if (feedback) {
+                feedback.style.color = '#b83e3e';
+                feedback.textContent = 'Ce n\'est pas l\'astre où vit la petite rose.';
+              }
             }
           });
         });
@@ -3298,21 +3344,29 @@
         // ===================================================
         // JEU 5 : LE CYGNE
         // ===================================================
-        document.getElementById('form-game-5').addEventListener('submit', (e) => {
-          e.preventDefault();
-          const val = normalize(document.getElementById('input-game-5').value);
-          const feedback = document.getElementById('game-5-feedback');
-          if (val === 'CYGNE') {
-            feedback.style.color = '#387845';
-            feedback.textContent = 'Le Cygne royal déploie ses ailes sur la grève.';
-            setTimeout(() => {
-              grantFeather(5, 'Plume d\'Argent des Eaux', 'Les eaux calmes s\'ouvrent. Tu possèdes maintenant les cinq plumes !');
-            }, 700);
-          } else {
-            feedback.style.color = '#b83e3e';
-            feedback.textContent = 'Ce n\'est pas l\'anagramme correct des lettres G-N-C-Y-E.';
-          }
-        });
+        const formGame5 = document.getElementById('form-game-5');
+        if (formGame5) {
+          formGame5.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const input5 = document.getElementById('input-game-5');
+            const val = normalize(input5 ? input5.value : '');
+            const feedback = document.getElementById('game-5-feedback');
+            if (val === 'CYGNE') {
+              if (feedback) {
+                feedback.style.color = '#387845';
+                feedback.textContent = 'Le Cygne royal déploie ses ailes sur la grève.';
+              }
+              setTimeout(() => {
+                grantFeather(5, 'Plume d\'Argent des Eaux', 'Les eaux calmes s\'ouvrent. Tu possèdes maintenant les cinq plumes !');
+              }, 700);
+            } else {
+              if (feedback) {
+                feedback.style.color = '#b83e3e';
+                feedback.textContent = 'Ce n\'est pas l\'anagramme correct des lettres G-N-C-Y-E.';
+              }
+            }
+          });
+        }
 
         // ===================================================
         // DÉMARRAGE & RESTAURATION
