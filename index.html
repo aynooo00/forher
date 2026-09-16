@@ -10,6 +10,33 @@
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
 
+    <script>
+      (function () {
+        try {
+          var origFetch = window.fetch;
+          var _fetch = typeof origFetch === 'function' ? origFetch.bind(window) : origFetch;
+          var descriptor = {
+            get: function () {
+              return _fetch;
+            },
+            set: function (fn) {
+              _fetch = fn;
+            },
+            configurable: true,
+            enumerable: true
+          };
+          try {
+            Object.defineProperty(window, 'fetch', descriptor);
+          } catch (e) {}
+          try {
+            if (typeof Window !== 'undefined' && Window.prototype) {
+              Object.defineProperty(Window.prototype, 'fetch', descriptor);
+            }
+          } catch (e) {}
+        } catch (e) {}
+      })();
+    </script>
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1278,44 +1305,117 @@
         }
       }
 
-      /* Game Over - Animation fluide et changement de couleur de fond */
-      .game-over-screen {
+      /* Game Over Plein Écran - Brise Magique */
+      .game-over-modal {
         display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 150;
+        background: rgba(36, 18, 20, 0.72);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        animation: fadeIn 0.35s ease forwards;
+      }
+
+      .game-over-card {
+        background: radial-gradient(circle at 50% 0%, #fffefe 0%, #fff7f7 100%);
+        border: 1.5px solid #ecc0b9;
+        border-radius: 24px;
+        padding: 38px 28px 32px;
+        text-align: center;
+        box-shadow: 0 24px 60px rgba(90, 30, 30, 0.28), 0 0 40px rgba(223, 104, 104, 0.16);
         width: 100%;
         max-width: 480px;
-        margin: 12px auto;
-        padding: 0 8px;
-        animation: failureCardEnter 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        animation: failureCardEnter 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       }
 
       @keyframes failureCardEnter {
         0% {
           opacity: 0;
-          transform: translateY(26px) scale(0.96);
+          transform: scale(0.92) translateY(24px);
         }
         100% {
           opacity: 1;
-          transform: translateY(0) scale(1);
+          transform: scale(1) translateY(0);
         }
       }
 
-      .game-over-card {
-        background: rgba(255, 255, 255, 0.98);
-        border: 1.5px solid #eac5be;
-        border-radius: 20px;
-        padding: 26px 20px;
-        text-align: center;
-        box-shadow: 0 14px 36px rgba(110, 50, 50, 0.16);
-        width: 100%;
+      .game-over-icon-aura {
+        position: relative;
+        width: 70px;
+        height: 70px;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .game-over-icon-circle {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #fae6e6 0%, #fff0f0 100%);
+        border: 2px solid #dfa5a5;
+        font-size: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 6px 20px rgba(223, 104, 104, 0.35);
+        animation: pulseGlowRose 2.5s ease-in-out infinite;
+      }
+
+      @keyframes pulseGlowRose {
+        0%, 100% {
+          box-shadow: 0 6px 18px rgba(223, 104, 104, 0.3);
+          transform: scale(1);
+        }
+        50% {
+          box-shadow: 0 10px 28px rgba(223, 104, 104, 0.55);
+          transform: scale(1.05);
+        }
+      }
+
+      .game-over-ribbon-tag {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: #933c3c;
+        background: #fae8e8;
+        border: 1px solid #ecc2c2;
+        padding: 5px 16px;
+        border-radius: 999px;
+        margin-bottom: 12px;
+      }
+
+      .game-over-title {
+        font-family: var(--font-serif);
+        font-size: 1.65rem;
+        color: #5c2323;
+        margin-bottom: 10px;
+        line-height: 1.25;
       }
 
       .game-over-poetic-text {
         font-family: var(--font-poetic);
-        font-size: 1.08rem;
-        color: #723c3c;
+        font-size: 1.05rem;
+        color: #6a3434;
         font-style: italic;
         line-height: 1.6;
-        margin: 8px 0 12px;
+        margin: 0 0 10px;
+      }
+
+      .game-over-hint-subtext {
+        font-size: 0.88rem;
+        color: #8c5b5b;
+        line-height: 1.5;
+        margin: 0 0 20px;
       }
 
       .restart-btn {
@@ -1332,7 +1432,7 @@
         cursor: pointer;
         box-shadow: 0 4px 16px rgba(223, 104, 104, 0.38);
         transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        margin-top: 6px;
+        margin-top: 4px;
       }
 
       .restart-btn:hover {
@@ -2136,27 +2236,6 @@
             </div>
           </div>
         </main>
-
-        <!-- Écran / Carte d'échec intégrée : juste le texte poétique et le bouton recommencer -->
-        <section class="game-over-screen" id="game-over-screen" aria-live="assertive">
-          <div class="game-over-card">
-            <div style="font-size: 26px; margin-bottom: 2px;">🥀</div>
-            <h2 style="font-family: var(--font-serif); font-size: 21px; color: #723c3c; margin-bottom: 6px;">
-              Une brise magique s'éveille...
-            </h2>
-            <p class="game-over-poetic-text">
-              Les six tentatives sont épuisées, mais une brise magique s'éveille pour guider vos pas...
-            </p>
-
-            <button type="button" class="restart-btn" id="restart-game-btn">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="1 4 1 10 7 10"></polyline>
-                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-              </svg>
-              <span>Recommencer l'épreuve</span>
-            </button>
-          </div>
-        </section>
       </section>
 
       <!-- ===================================================
@@ -2341,6 +2420,32 @@
             Annuler et continuer
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- ===================================================
+         MODAL PLEIN ÉCRAN D'ÉCHEC : LA BRISE MAGIQUE S'ÉVEILLE
+         =================================================== -->
+    <div class="game-over-modal" id="game-over-modal" aria-live="assertive">
+      <div class="game-over-card">
+        <div class="game-over-icon-aura">
+          <div class="game-over-icon-circle">🥀</div>
+        </div>
+        <span class="game-over-ribbon-tag">Tentatives Épuisées</span>
+        <h2 class="game-over-title">Une brise magique s'éveille...</h2>
+        <p class="game-over-poetic-text">
+          Les six tentatives sont épuisées, mais une brise magique s'éveille pour guider vos pas...
+        </p>
+        <p class="game-over-hint-subtext">
+          Les lettres qui composent le mot secret s'illuminent et dansent délicatement sur le clavier pour vous guider.
+        </p>
+        <button type="button" class="restart-btn" id="restart-game-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+          </svg>
+          <span>Recommencer l'épreuve</span>
+        </button>
       </div>
     </div>
 
@@ -2607,36 +2712,44 @@
         const btnReplayIntroKeep = document.getElementById('btn-replay-intro-keep');
         const btnResetAllProgress = document.getElementById('btn-reset-all-progress');
 
-        btnShowRestartModal.addEventListener('click', () => {
-          restartModal.style.display = 'flex';
-        });
+        if (btnShowRestartModal) {
+          btnShowRestartModal.addEventListener('click', () => {
+            if (restartModal) restartModal.style.display = 'flex';
+          });
+        }
 
-        btnCancelRestart.addEventListener('click', () => {
-          restartModal.style.display = 'none';
-        });
+        if (btnCancelRestart) {
+          btnCancelRestart.addEventListener('click', () => {
+            if (restartModal) restartModal.style.display = 'none';
+          });
+        }
 
         // 1. Revoir l'histoire depuis le début sans perdre ses plumes
-        btnReplayIntroKeep.addEventListener('click', () => {
-          restartModal.style.display = 'none';
-          resetEnvelopeVisuals();
-          navigateTo('enveloppe');
-        });
+        if (btnReplayIntroKeep) {
+          btnReplayIntroKeep.addEventListener('click', () => {
+            if (restartModal) restartModal.style.display = 'none';
+            resetEnvelopeVisuals();
+            navigateTo('enveloppe');
+          });
+        }
 
         // 2. Tout réinitialiser à zéro
-        btnResetAllProgress.addEventListener('click', () => {
-          state = {
-            currentScreen: 'enveloppe',
-            feathers: { 1: false, 2: false, 3: false, 4: false, 5: false },
-            game1: { attempts: [], isWon: false, isGameOver: false, hasDancingLetters: false }
-          };
-          saveState();
-          updateFeathersUI();
-          restartGame1(false);
-          resetEnvelopeVisuals();
-          restartModal.style.display = 'none';
-          showToast('✨ L\'aventure a été réinitialisée depuis le début.');
-          navigateTo('enveloppe');
-        });
+        if (btnResetAllProgress) {
+          btnResetAllProgress.addEventListener('click', () => {
+            state = {
+              currentScreen: 'enveloppe',
+              feathers: { 1: false, 2: false, 3: false, 4: false, 5: false },
+              game1: { attempts: [], isWon: false, isGameOver: false, hasDancingLetters: false }
+            };
+            saveState();
+            updateFeathersUI();
+            restartGame1(false);
+            resetEnvelopeVisuals();
+            if (restartModal) restartModal.style.display = 'none';
+            showToast('✨ L\'aventure a été réinitialisée depuis le début.');
+            navigateTo('enveloppe');
+          });
+        }
 
         function resetEnvelopeVisuals() {
           const flap = document.getElementById('envelope-flap');
@@ -2662,27 +2775,42 @@
           }, 450);
         }
 
-        btnOpenEnvelope.addEventListener('click', triggerOpenEnvelope);
-        btnOpenDirect.addEventListener('click', triggerOpenEnvelope);
-        btnOpenEnvelope.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            triggerOpenEnvelope();
-          }
-        });
+        if (btnOpenEnvelope) {
+          btnOpenEnvelope.addEventListener('click', triggerOpenEnvelope);
+          btnOpenEnvelope.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              triggerOpenEnvelope();
+            }
+          });
+        }
+
+        if (btnOpenDirect) {
+          btnOpenDirect.addEventListener('click', triggerOpenEnvelope);
+        }
 
         // Clic sur "Entrer dans le Cabinet" (Écran Intro)
-        document.getElementById('btn-start-quest').addEventListener('click', () => {
-          navigateTo('hub');
-        });
+        const btnStartQuest = document.getElementById('btn-start-quest');
+        if (btnStartQuest) {
+          btnStartQuest.addEventListener('click', () => {
+            navigateTo('hub');
+          });
+        }
 
         // Navigation rapide en haut
-        document.getElementById('nav-brand-title').addEventListener('click', () => {
-          navigateTo('hub');
-        });
-        document.getElementById('nav-hub-btn').addEventListener('click', () => {
-          navigateTo('hub');
-        });
+        const navBrandTitle = document.getElementById('nav-brand-title');
+        if (navBrandTitle) {
+          navBrandTitle.addEventListener('click', () => {
+            navigateTo('hub');
+          });
+        }
+
+        const navHubBtn = document.getElementById('nav-hub-btn');
+        if (navHubBtn) {
+          navHubBtn.addEventListener('click', () => {
+            navigateTo('hub');
+          });
+        }
 
         // Accès aux jeux depuis le Hub : Uniquement Jeu 1 accessible
         const slotGame1 = document.getElementById('slot-game-1');
@@ -2887,9 +3015,12 @@
           btnModalToHub.addEventListener('click', handleVictoryDismiss);
         }
 
-        document.getElementById('btn-view-epilogue').addEventListener('click', () => {
-          alert('Félicitations pour avoir réuni les 5 plumes de la Quête ! La carte du trésor au cœur de la France est désormais gravée dans vos songes.');
-        });
+        const btnViewEpilogue = document.getElementById('btn-view-epilogue');
+        if (btnViewEpilogue) {
+          btnViewEpilogue.addEventListener('click', () => {
+            alert('Félicitations pour avoir réuni les 5 plumes de la Quête ! La carte du trésor au cœur de la France est désormais gravée dans vos songes.');
+          });
+        }
 
         // ===================================================
         // JEU 1 : L'ÉNIGME LITTÉRAIRE (WORDLE RECAMIER)
@@ -2906,7 +3037,7 @@
         const clueTextEl = document.getElementById('clue-text');
         const attemptCounterEl = document.getElementById('attempt-counter');
         const gameAreaEl = document.getElementById('game-area');
-        const gameOverScreenEl = document.getElementById('game-over-screen');
+        const gameOverModalEl = document.getElementById('game-over-modal');
         const restartGameBtn = document.getElementById('restart-game-btn');
         const virtualKeyboardEl = document.getElementById('virtual-keyboard');
 
@@ -3144,16 +3275,18 @@
           // Changement fluide de la couleur de fond pour marquer l'échec (teinte rosée douce)
           document.body.style.backgroundColor = '#fae1e3';
 
-          // Conserver la grille et son design avec les 6 tentatives visibles sans masquer la zone
-          if (formEl) formEl.style.display = 'none';
-          if (virtualKeyboardEl) virtualKeyboardEl.style.display = 'none';
-          if (clueZoneEl) clueZoneEl.style.display = 'none';
-          if (gameOverScreenEl) {
-            gameOverScreenEl.style.display = 'block';
+          // Afficher la brise magique en plein écran
+          if (gameOverModalEl) {
+            gameOverModalEl.style.display = 'flex';
           }
         }
 
         function restartGame1(enableDancingLetters = true) {
+          // Fermer l'écran plein écran de la brise magique
+          if (gameOverModalEl) {
+            gameOverModalEl.style.display = 'none';
+          }
+
           // Lors du recommencement après échec : les touches dansent UNIQUEMENT sur le clavier virtuel
           state.game1 = {
             attempts: [],
@@ -3166,7 +3299,7 @@
           // Rétablir la couleur de fond pastel initiale de l'épreuve
           document.body.style.backgroundColor = THEME_COLORS.jeu1 || '#fdf1f1';
 
-          if (gameOverScreenEl) gameOverScreenEl.style.display = 'none';
+          // Rétablir et rendre visibles tous les éléments du Wordle
           if (formEl) formEl.style.display = 'flex';
           if (virtualKeyboardEl) virtualKeyboardEl.style.display = 'flex';
           if (clueZoneEl) clueZoneEl.style.display = 'block';
@@ -3192,17 +3325,31 @@
           setTimeout(() => inputEl.focus(), 150);
         }
 
-        restartGameBtn.addEventListener('click', () => restartGame1(true));
+        if (restartGameBtn) {
+          restartGameBtn.addEventListener('click', () => restartGame1(true));
+        }
 
-        inputEl.addEventListener('input', (e) => {
-          currentInput = e.target.value;
-          renderCurrentRow();
-        });
+        if (gameOverModalEl) {
+          gameOverModalEl.addEventListener('click', (e) => {
+            if (e.target === gameOverModalEl) {
+              restartGame1(true);
+            }
+          });
+        }
 
-        formEl.addEventListener('submit', (e) => {
-          e.preventDefault();
-          submitGuess();
-        });
+        if (inputEl) {
+          inputEl.addEventListener('input', (e) => {
+            currentInput = e.target.value;
+            renderCurrentRow();
+          });
+        }
+
+        if (formEl) {
+          formEl.addEventListener('submit', (e) => {
+            e.preventDefault();
+            submitGuess();
+          });
+        }
 
         document.querySelectorAll('.key-btn[data-key]').forEach(btn => {
           btn.addEventListener('click', () => {
@@ -3216,22 +3363,38 @@
           });
         });
 
-        document.getElementById('key-backspace').addEventListener('click', () => {
-          if (state.game1.isWon || state.game1.isGameOver) return;
-          currentInput = currentInput.slice(0, -1);
-          inputEl.value = currentInput;
-          renderCurrentRow();
-        });
+        const keyBackspaceEl = document.getElementById('key-backspace');
+        if (keyBackspaceEl) {
+          keyBackspaceEl.addEventListener('click', () => {
+            if (state.game1.isWon || state.game1.isGameOver) return;
+            currentInput = currentInput.slice(0, -1);
+            inputEl.value = currentInput;
+            renderCurrentRow();
+          });
+        }
 
-        document.getElementById('key-enter').addEventListener('click', () => {
-          submitGuess();
-        });
+        const keyEnterEl = document.getElementById('key-enter');
+        if (keyEnterEl) {
+          keyEnterEl.addEventListener('click', () => {
+            submitGuess();
+          });
+        }
 
         // Clavier physique universel
         document.addEventListener('keydown', (e) => {
           if (screens.jeu1 && !screens.jeu1.classList.contains('active')) return;
+
+          // Si la brise magique est affichée en plein écran, Entrée ou Espace permet de recommencer
+          if (state.game1.isGameOver) {
+            if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
+              e.preventDefault();
+              restartGame1(true);
+            }
+            return;
+          }
+
           if (document.activeElement === inputEl) return;
-          if (state.game1.isWon || state.game1.isGameOver) return;
+          if (state.game1.isWon) return;
 
           if (e.key === 'Enter') {
             e.preventDefault();
@@ -3262,7 +3425,9 @@
             });
           }
         }
-        coordsBox.addEventListener('click', copyCoords);
+        if (coordsBox) {
+          coordsBox.addEventListener('click', copyCoords);
+        }
 
         // ===================================================
         // JEU 2 : L'APOTHICAIRE
