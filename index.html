@@ -677,7 +677,7 @@
       }
 
       /* ===================================================
-         ÉCRAN D : LE JEU 1 (BOUTIQUE PARISIENNE - RECAMIER)
+         ÉCRAN D : LE JEU 1 (BOUTIQUE PARISIENNE - ÉPREUVE 1)
          =================================================== */
       #jeu-1 {
         width: 100%;
@@ -1129,7 +1129,7 @@
         opacity: 0.6;
       }
 
-      /* Bannière Magique des Lettres Dansantes (RECAMIER) */
+      /* Bannière Magique des Lettres Dansantes */
       .dancing-letters-banner {
         width: 100%;
         max-width: 480px;
@@ -1190,7 +1190,7 @@
         user-select: none;
       }
 
-      /* Deck complet de l'alphabet : Toutes les lettres affichées, RECAMIER qui dansent */
+      /* Deck complet de l'alphabet : Toutes les lettres affichées, lettres cibles qui dansent */
       .full-alphabet-deck {
         display: flex;
         flex-wrap: wrap;
@@ -1968,57 +1968,209 @@
       }
 
       .action-btn-x {
-        width: 58px;
-        height: 58px;
+        width: 62px;
+        height: 62px;
         border-radius: 50%;
-        background: radial-gradient(circle at 35% 35%, #3c2c23 0%, #1c1511 75%, #100b08 100%);
-        border: 2px solid #d4af37;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), inset 0 1px 3px rgba(255, 235, 170, 0.35);
+        background: radial-gradient(circle at 35% 35%, #3d2f25 0%, #1c1511 75%, #0f0b08 100%);
+        border: 2px solid rgba(212, 175, 55, 0.6);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), inset 0 1px 3px rgba(255, 235, 170, 0.3);
         color: #fce7b0;
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         touch-action: none;
         user-select: none;
-        transition: transform 0.12s ease, box-shadow 0.12s ease;
+        transition: transform 0.12s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        position: relative;
       }
 
       .action-btn-x:active, .action-btn-x.active {
         transform: scale(0.92);
         background: linear-gradient(135deg, #d4af37 0%, #a67c1e 100%);
         color: #1a120b;
-        box-shadow: 0 0 16px rgba(212, 175, 55, 0.6);
+        box-shadow: 0 0 18px rgba(212, 175, 55, 0.7);
       }
 
+      .action-btn-icon-core {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease;
+      }
+
+      .action-btn-glow-ring {
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        border: 2px solid rgba(212, 175, 55, 0);
+        pointer-events: none;
+        transition: all 0.3s ease;
+      }
+
+      /* Éclairage et pulsation subtile du bouton d'action lorsqu'une interaction est possible */
       .action-btn-x.pulsing {
-        border-color: #ffd866;
-        box-shadow: 0 0 0 5px rgba(212, 175, 55, 0.35), 0 6px 22px rgba(212, 175, 55, 0.45);
+        border-color: #ffe07a;
+        color: #fff8e1;
+        background: radial-gradient(circle at 35% 35%, #543f30 0%, #291d16 75%, #18110c 100%);
+        box-shadow: 0 0 0 5px rgba(212, 175, 55, 0.35), 0 0 24px rgba(212, 175, 55, 0.6), inset 0 0 10px rgba(255, 220, 120, 0.4);
         animation: actionPulseGold 1.1s ease-in-out infinite alternate;
       }
 
+      .action-btn-x.pulsing .action-btn-glow-ring {
+        border-color: rgba(255, 220, 110, 0.5);
+        animation: ringPulse 1.1s ease-in-out infinite alternate;
+      }
+
+      @keyframes ringPulse {
+        0% { transform: scale(1); opacity: 0.4; }
+        100% { transform: scale(1.15); opacity: 0.9; }
+      }
+
       @keyframes actionPulseGold {
-        0% { transform: scale(1); box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.25), 0 6px 18px rgba(0, 0, 0, 0.4); }
-        100% { transform: scale(1.08); box-shadow: 0 0 0 7px rgba(212, 175, 55, 0.45), 0 8px 26px rgba(212, 175, 55, 0.5); }
+        0% { transform: scale(1); box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.3), 0 4px 16px rgba(0, 0, 0, 0.4); }
+        100% { transform: scale(1.09); box-shadow: 0 0 0 8px rgba(212, 175, 55, 0.5), 0 6px 28px rgba(212, 175, 55, 0.65); }
       }
 
-      .action-btn-letter {
-        font-family: var(--font-serif);
-        font-weight: 800;
-        font-size: 1.3rem;
-        line-height: 1;
-        color: #f7e09e;
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+      .world-mobile-nav-btn {
+        display: none;
       }
 
-      .action-btn-sub {
-        font-size: 9px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: #d1b896;
-        margin-top: 1px;
+      /* Mode Plein Écran Mobile pour le Monde 2D */
+      @media (max-width: 768px) {
+        body.mode-monde-fullscreen,
+        body:has(#ecran-monde.active) {
+          overflow: hidden !important;
+          height: 100% !important;
+          width: 100% !important;
+          position: fixed !important;
+          inset: 0 !important;
+        }
+
+        body.mode-monde-fullscreen #app-container,
+        #app-container:has(#ecran-monde.active) {
+          max-width: 100vw !important;
+          width: 100vw !important;
+          height: 100dvh !important;
+          height: 100vh !important;
+          min-height: 100% !important;
+          padding: 0 !important;
+          margin: 0 !important;
+        }
+
+        body.mode-monde-fullscreen .top-navbar,
+        body:has(#ecran-monde.active) .top-navbar {
+          display: none !important;
+        }
+
+        #ecran-monde.active {
+          position: fixed !important;
+          inset: 0 !important;
+          width: 100vw !important;
+          height: 100dvh !important;
+          height: 100vh !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          z-index: 100 !important;
+          background: #1c1815 !important;
+        }
+
+        #ecran-monde.active .world-card {
+          max-width: 100% !important;
+          width: 100% !important;
+          height: 100% !important;
+          border-radius: 0 !important;
+          border: none !important;
+          box-shadow: none !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          gap: 0 !important;
+          display: flex !important;
+          flex-direction: column !important;
+        }
+
+        #ecran-monde.active .world-header {
+          position: absolute !important;
+          top: 12px !important;
+          left: 12px !important;
+          right: 12px !important;
+          z-index: 25 !important;
+          padding: 0 !important;
+          pointer-events: none !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: space-between !important;
+        }
+
+        #ecran-monde.active .world-zone-badge {
+          pointer-events: auto !important;
+          background: rgba(18, 14, 12, 0.85) !important;
+          backdrop-filter: blur(10px) !important;
+          -webkit-backdrop-filter: blur(10px) !important;
+          color: #f7eedb !important;
+          border: 1px solid rgba(212, 175, 55, 0.45) !important;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+          font-size: 0.8rem !important;
+          padding: 5px 12px !important;
+        }
+
+        #ecran-monde.active .world-mobile-nav-btn {
+          pointer-events: auto !important;
+          display: inline-flex !important;
+          align-items: center !important;
+          gap: 6px !important;
+          background: rgba(18, 14, 12, 0.85) !important;
+          backdrop-filter: blur(10px) !important;
+          -webkit-backdrop-filter: blur(10px) !important;
+          color: #fce4a6 !important;
+          border: 1px solid rgba(212, 175, 55, 0.4) !important;
+          border-radius: 999px !important;
+          padding: 6px 12px !important;
+          font-size: 0.76rem !important;
+          font-weight: 600 !important;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+          cursor: pointer !important;
+        }
+
+        #ecran-monde.active .world-controls-tip {
+          display: none !important;
+        }
+
+        #ecran-monde.active .world-viewport {
+          flex: 1 1 auto !important;
+          width: 100% !important;
+          height: 100% !important;
+          border-radius: 0 !important;
+          border: none !important;
+          box-shadow: none !important;
+        }
+
+        #ecran-monde.active #world-canvas {
+          width: 100% !important;
+          height: 100% !important;
+          aspect-ratio: auto !important;
+          object-fit: cover !important;
+        }
+
+        #ecran-monde.active .virtual-dpad {
+          bottom: max(14px, env(safe-area-inset-bottom, 14px)) !important;
+          left: max(12px, env(safe-area-inset-left, 12px)) !important;
+          transform: scale(1.08) !important;
+          transform-origin: bottom left !important;
+        }
+
+        #ecran-monde.active .virtual-action-zone {
+          bottom: max(16px, env(safe-area-inset-bottom, 16px)) !important;
+          right: max(14px, env(safe-area-inset-right, 14px)) !important;
+          transform: scale(1.08) !important;
+          transform-origin: bottom right !important;
+        }
+
+        #ecran-monde.active .rpg-dialogue-box {
+          bottom: max(12px, env(safe-area-inset-bottom, 12px)) !important;
+          left: 10px !important;
+          right: 10px !important;
+        }
       }
 
       /* ===================================================
@@ -2038,7 +2190,8 @@
         transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.25s;
       }
 
-      .rpg-dialogue-box.active {
+      .rpg-dialogue-box.active,
+      .rpg-dialogue-box.open {
         opacity: 1;
         visibility: visible;
         transform: translateY(0) scale(1);
@@ -2487,6 +2640,10 @@
               <span class="tip-kbd">⌨️ Flèches / ZQSD</span>
               <span class="tip-kbd-action">Touche <strong>X</strong> pour inspecter</span>
             </div>
+            <button type="button" class="world-mobile-nav-btn" id="btn-world-open-hub" aria-label="Carnet des Épreuves">
+              <span>🪶</span>
+              <span>Carnet</span>
+            </button>
           </div>
 
           <!-- Conteneur d'affichage du Canvas -->
@@ -2495,7 +2652,7 @@
 
             <!-- Contrôles Tactiles Mobiles par-dessus le Canvas -->
             <div class="mobile-touch-layer" id="mobile-touch-layer">
-              <!-- D-Pad virtuel (croix directionnelle discrète en bas à gauche) -->
+              <!-- D-Pad virtuel (croix directionnelle discrète en bas à gauche, sans aucun texte) -->
               <div class="virtual-dpad" id="virtual-dpad" aria-label="Croix directionnelle tactile">
                 <button type="button" class="dpad-btn dpad-up" data-dir="up" aria-label="Haut">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>
@@ -2514,11 +2671,15 @@
                 </button>
               </div>
 
-              <!-- Bouton d'action X en bas à droite -->
+              <!-- Bouton d'action tactile en bas à droite (aucun texte, illumination dynamique) -->
               <div class="virtual-action-zone">
-                <button type="button" class="action-btn-x" id="btn-mobile-action-x" aria-label="Inspecter">
-                  <span class="action-btn-letter">X</span>
-                  <span class="action-btn-sub">Inspecter</span>
+                <button type="button" class="action-btn-x" id="btn-mobile-action-x" aria-label="Action">
+                  <span class="action-btn-icon-core">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                  </span>
+                  <span class="action-btn-glow-ring"></span>
                 </button>
               </div>
             </div>
@@ -2541,7 +2702,7 @@
                 <!-- Contenu textuel avec machine à écrire -->
                 <div class="dialogue-content">
                   <div class="dialogue-speaker-row">
-                    <span class="dialogue-speaker-name" id="dialogue-speaker-name">Le Récamier</span>
+                    <span class="dialogue-speaker-name" id="dialogue-speaker-name">Bistrot Littéraire</span>
                     <span class="dialogue-speaker-district" id="dialogue-speaker-district">Quartier Latin</span>
                   </div>
                   <div class="dialogue-body">
@@ -2704,7 +2865,7 @@
       </section>
 
       <!-- ===================================================
-           ÉTAPE D : LE JEU 1 (BOUTIQUE PARISIENNE - RECAMIER)
+           ÉTAPE D : LE JEU 1 (BOUTIQUE PARISIENNE - ÉPREUVE 1)
            =================================================== -->
       <section id="jeu-1" class="screen" aria-label="Épreuve 1">
         <header class="store-awning">
@@ -3234,12 +3395,20 @@
           // Remonter en haut de page pour le confort de lecture
           window.scrollTo({ top: 0, behavior: 'smooth' });
 
-          // Gestion du Monde 2D (démarrer / mettre en pause)
+          // Gestion du Monde 2D (démarrer / mettre en pause / redimensionnement plein écran)
           if (screenKey === 'monde') {
-            if (window.WorldEngine && window.WorldEngine.start) {
-              window.WorldEngine.start();
+            document.body.classList.add('mode-monde-fullscreen');
+            if (window.WorldEngine) {
+              if (window.WorldEngine.start) {
+                window.WorldEngine.start();
+              }
+              if (window.WorldEngine.resize) {
+                setTimeout(() => window.WorldEngine.resize(), 50);
+                setTimeout(() => window.WorldEngine.resize(), 200);
+              }
             }
           } else {
+            document.body.classList.remove('mode-monde-fullscreen');
             if (window.WorldEngine && window.WorldEngine.pause) {
               window.WorldEngine.pause();
             }
@@ -3488,6 +3657,13 @@
         });
         window.WorldEngine = WorldEngine;
 
+        const btnWorldOpenHub = document.getElementById('btn-world-open-hub');
+        if (btnWorldOpenHub) {
+          btnWorldOpenHub.addEventListener('click', () => {
+            navigateTo('hub');
+          });
+        }
+
         // ===================================================
         // ENVOL MAGIQUE DE PLUMES (ANIMATION CANVAS)
         // ===================================================
@@ -3664,7 +3840,7 @@
         }
 
         // ===================================================
-        // JEU 1 : L'ÉNIGME LITTÉRAIRE (WORDLE RECAMIER)
+        // JEU 1 : L'ÉNIGME LITTÉRAIRE (WORDLE ÉPREUVE 1)
         // ===================================================
         const gridEl = document.getElementById('wordle-grid');
         const inputEl = document.getElementById('word-input');
