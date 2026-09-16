@@ -10,6 +10,25 @@
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
 
+    <script>
+      // Assurer que window.fetch possède à la fois un getter et un setter configurable
+      // évitant l'erreur "Cannot set property fetch of #<Window> which has only a getter"
+      // provoquée par les scripts d'inspection, proxies ou environnements d'iframe.
+      (function() {
+        try {
+          var currentFetch = window.fetch;
+          Object.defineProperty(window, 'fetch', {
+            get: function() { return currentFetch; },
+            set: function(val) { currentFetch = val; },
+            configurable: true,
+            enumerable: true
+          });
+        } catch (e) {
+          // Ignorer si non autorisé
+        }
+      })();
+    </script>
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -120,16 +139,19 @@
       .save-status-pill {
         display: inline-flex;
         align-items: center;
-        gap: 5px;
-        font-size: 0.72rem;
-        font-weight: 600;
-        color: #5c7b64;
-        background: #eef7f0;
-        border: 1px solid #d4ebd7;
-        padding: 3px 9px;
-        border-radius: 999px;
-        letter-spacing: 0.03em;
-        transition: opacity 0.3s ease;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        color: #3b6e49;
+        background: #eaf6ed;
+        border: 1px solid #cce7d3;
+        border-radius: 50%;
+        transition: transform 0.25s ease, background-color 0.25s ease, opacity 0.3s ease;
+      }
+
+      .save-status-pill.saving-pulse {
+        transform: scale(1.22);
+        background-color: #d8f1df;
       }
 
       .nav-right {
@@ -416,6 +438,21 @@
         flex: 1;
         width: 100%;
         min-height: 140px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .letter-placeholder-text {
+        font-family: var(--font-poetic);
+        font-style: italic;
+        font-size: 1.16rem;
+        color: #6d5b54;
+        line-height: 1.8;
+        text-align: center;
+        padding: 16px 12px;
+        letter-spacing: 0.02em;
+        margin: 0;
       }
 
       .poem-line {
@@ -1673,6 +1710,444 @@
         from { opacity: 0; transform: translateY(6px); }
         to { opacity: 1; transform: translateY(0); }
       }
+
+      /* Transition d'entrée poétique dans l'Épreuve 1 */
+      .trial-entrance-curtain {
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(circle at center, rgba(255, 250, 246, 0.96) 0%, rgba(252, 238, 238, 0.98) 100%);
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.35s;
+        backdrop-filter: blur(8px);
+      }
+
+      .trial-entrance-curtain.active {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+      }
+
+      .curtain-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        transform: scale(0.92);
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .trial-entrance-curtain.active .curtain-content {
+        transform: scale(1);
+      }
+
+      .curtain-feather {
+        font-size: 40px;
+        filter: drop-shadow(0 4px 12px rgba(180, 100, 100, 0.25));
+        animation: floatCurtainFeather 1.4s ease-in-out infinite alternate;
+      }
+
+      @keyframes floatCurtainFeather {
+        0% { transform: translateY(0) rotate(-4deg); }
+        100% { transform: translateY(-8px) rotate(4deg); }
+      }
+
+      .curtain-caption {
+        font-family: var(--font-poetic);
+        font-style: italic;
+        font-size: 1.15rem;
+        color: #6b4347;
+        letter-spacing: 0.04em;
+        margin: 0;
+      }
+
+      /* Animation d'apparition douce et élégante de l'épreuve 1 */
+      #jeu-1.active {
+        animation: enterTrialOne 0.52s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+
+      @keyframes enterTrialOne {
+        0% {
+          opacity: 0;
+          transform: translateY(18px) scale(0.985);
+          filter: blur(4px);
+        }
+        60% {
+          filter: blur(0);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+          filter: blur(0);
+        }
+      }
+
+      /* ===================================================
+         STYLES DU MONDE 2D (CANVAS & OVERLAY UI)
+         =================================================== */
+      #ecran-monde {
+        width: 100%;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .world-card {
+        width: 100%;
+        max-width: 860px;
+        background: #fdfaf6;
+        border: 1px solid #ebdccb;
+        border-radius: 20px;
+        box-shadow: 0 16px 40px rgba(70, 50, 40, 0.08), 0 4px 12px rgba(70, 50, 40, 0.04);
+        padding: 12px 12px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .world-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 4px 6px;
+      }
+
+      .world-zone-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #f3ece4;
+        border: 1px solid #e2d3c2;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-family: var(--font-sans);
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #553e34;
+        letter-spacing: 0.02em;
+        transition: all 0.25s ease;
+      }
+
+      .world-zone-badge .pulse-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #5b8f68;
+        box-shadow: 0 0 0 3px rgba(91, 143, 104, 0.2);
+        animation: pulseDot 1.8s ease-in-out infinite;
+      }
+
+      @keyframes pulseDot {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.25); opacity: 0.7; }
+      }
+
+      .world-controls-tip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.76rem;
+        color: #7b6861;
+      }
+
+      .world-controls-tip .tip-kbd {
+        background: #f7f1e9;
+        border: 1px solid #e5d8cb;
+        padding: 3px 8px;
+        border-radius: 6px;
+        font-weight: 500;
+      }
+
+      .world-controls-tip .tip-kbd-action {
+        background: #f2e9dc;
+        border: 1px solid #dfd1c0;
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-weight: 600;
+        color: #4b362e;
+      }
+
+      .world-viewport {
+        position: relative;
+        width: 100%;
+        border-radius: 14px;
+        overflow: hidden;
+        background: #dbeef1;
+        border: 1.5px solid #dfd0be;
+        box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.04);
+      }
+
+      #world-canvas {
+        display: block;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 800 / 540;
+        touch-action: none;
+        user-select: none;
+      }
+
+      /* Couche de contrôles tactiles pour mobile par-dessus le Canvas */
+      .mobile-touch-layer {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 10;
+      }
+
+      .virtual-dpad {
+        position: absolute;
+        bottom: 12px;
+        left: 12px;
+        pointer-events: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        background: rgba(255, 252, 248, 0.75);
+        backdrop-filter: blur(8px);
+        padding: 6px;
+        border-radius: 20px;
+        border: 1px solid rgba(220, 205, 190, 0.8);
+        box-shadow: 0 4px 14px rgba(60, 40, 30, 0.14);
+      }
+
+      .dpad-middle-row {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+      }
+
+      .dpad-center-hub {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: rgba(225, 210, 195, 0.3);
+      }
+
+      .dpad-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid #dfd1c0;
+        color: #4b3830;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+        touch-action: none;
+        transition: transform 0.1s ease, background-color 0.1s ease;
+        user-select: none;
+      }
+
+      .dpad-btn:active, .dpad-btn.active {
+        background: #f1e4d5;
+        transform: scale(0.92);
+      }
+
+      .virtual-action-zone {
+        position: absolute;
+        bottom: 14px;
+        right: 14px;
+        pointer-events: auto;
+      }
+
+      .action-btn-x {
+        width: 58px;
+        height: 58px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 35% 35%, #fffdfa 0%, #faeee0 70%, #ebd7c1 100%);
+        border: 2px solid #d8b88f;
+        box-shadow: 0 6px 18px rgba(90, 60, 40, 0.18), 0 2px 6px rgba(90, 60, 40, 0.1);
+        color: #5a3b2b;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        touch-action: none;
+        user-select: none;
+        transition: transform 0.12s ease, box-shadow 0.12s ease;
+      }
+
+      .action-btn-x:active, .action-btn-x.active {
+        transform: scale(0.92);
+        background: #e6d3be;
+      }
+
+      .action-btn-x.pulsing {
+        border-color: #df6868;
+        box-shadow: 0 0 0 5px rgba(223, 104, 104, 0.3), 0 6px 18px rgba(90, 60, 40, 0.2);
+        animation: actionPulse 1s ease-in-out infinite alternate;
+      }
+
+      @keyframes actionPulse {
+        0% { transform: scale(1); }
+        100% { transform: scale(1.08); }
+      }
+
+      .action-btn-letter {
+        font-family: var(--font-sans);
+        font-weight: 800;
+        font-size: 1.25rem;
+        line-height: 1;
+        color: #4b3327;
+      }
+
+      .action-btn-sub {
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #8c6a58;
+        margin-top: 1px;
+      }
+
+      /* Modal d'inspection pour les zones verrouillées (Zones 2 à 5) */
+      .world-inspect-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(30, 20, 15, 0.45);
+        backdrop-filter: blur(5px);
+        z-index: 1000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .world-inspect-modal.active {
+        display: flex;
+        opacity: 1;
+      }
+
+      .inspect-modal-card {
+        background: #fdfaf6;
+        border: 1px solid #ebdcca;
+        border-radius: 18px;
+        max-width: 390px;
+        width: 100%;
+        padding: 28px 24px;
+        text-align: center;
+        box-shadow: 0 20px 48px rgba(50, 35, 25, 0.25);
+        transform: translateY(12px) scale(0.96);
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .world-inspect-modal.active .inspect-modal-card {
+        transform: translateY(0) scale(1);
+      }
+
+      .inspect-modal-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        background: #f4ede6;
+        border: 1px solid #dfcfbe;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        margin: 0 auto 12px;
+      }
+
+      .inspect-modal-title {
+        font-family: var(--font-serif);
+        font-size: 1.3rem;
+        color: #453229;
+        margin: 0 0 6px;
+      }
+
+      .inspect-modal-desc {
+        font-family: var(--font-poetic);
+        font-style: italic;
+        font-size: 1.05rem;
+        color: #6e584f;
+        margin: 0 0 18px;
+        line-height: 1.5;
+      }
+
+      .btn-inspect-close {
+        background: #463731;
+        color: #fff;
+        border: none;
+        padding: 9px 20px;
+        border-radius: 999px;
+        font-family: var(--font-sans);
+        font-size: 0.84rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 3px 10px rgba(70, 55, 49, 0.2);
+      }
+
+      .btn-inspect-close:hover {
+        background: #5d4a42;
+        transform: translateY(-1px);
+      }
+
+      /* Voile d'animation de sortie de l'épreuve (style chargement élégant) */
+      .trial-exit-curtain {
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(circle at center, rgba(255, 251, 247, 0.97) 0%, rgba(247, 240, 233, 0.98) 100%);
+        z-index: 1001;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.35s;
+        backdrop-filter: blur(8px);
+      }
+
+      .trial-exit-curtain.active {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+      }
+
+      .exit-loading-ring {
+        width: 62px;
+        height: 62px;
+        border-radius: 50%;
+        border: 3px solid #e8dacb;
+        border-top-color: #d6985a;
+        border-right-color: #649a75;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: spinLoadingRing 1.4s linear infinite;
+        box-shadow: 0 4px 16px rgba(180, 140, 100, 0.15);
+      }
+
+      @keyframes spinLoadingRing {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      .exit-spinning-feather {
+        font-size: 24px;
+        animation: counterSpin 1.4s linear infinite;
+      }
+
+      @keyframes counterSpin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(-360deg); }
+      }
     </style>
   </head>
   <body>
@@ -1690,11 +2165,10 @@
           </svg>
           <span>Cinq Plumes</span>
         </div>
-        <span class="save-status-pill" id="save-indicator" title="Vos épreuves et plumes sont sauvegardées sur cet appareil">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <span class="save-status-pill" id="save-indicator" title="Sauvegarde automatique activée" aria-label="Progression sauvegardée">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
-          Sauvegardé
         </span>
       </div>
 
@@ -1752,16 +2226,74 @@
             <span class="letter-feather-mark">🪶</span>
           </div>
 
-          <!-- Contenu de la lettre laissé vide pour votre future rédaction -->
-          <div class="blank-letter-area"></div>
+          <!-- Contenu de la lettre d'introduction -->
+          <div class="blank-letter-area">
+            <p class="letter-placeholder-text">
+              Un texte va être rédigé bientôt...
+            </p>
+          </div>
 
           <button id="btn-start-quest" class="btn-elegant" type="button">
-            <span>Entrer dans le Cabinet</span>
+            <span>Entrer dans le Monde</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="5" y1="12" x2="19" y2="12"></line>
               <polyline points="12 5 19 12 12 19"></polyline>
             </svg>
           </button>
+        </div>
+      </section>
+
+      <!-- ===================================================
+           LE MONDE 2D : CANVAS & FLÂNERIE DANS LES 5 ZONES
+           =================================================== -->
+      <section id="ecran-monde" class="screen" aria-label="Le Monde des Épreuves">
+        <div class="world-card">
+          <!-- Barre d'état du monde -->
+          <div class="world-header">
+            <div class="world-zone-badge" id="world-zone-badge">
+              <span class="pulse-dot"></span>
+              <span id="world-zone-text">Promenade dans le Monde</span>
+            </div>
+            <div class="world-controls-tip">
+              <span class="tip-kbd">⌨️ Flèches / ZQSD</span>
+              <span class="tip-kbd-action">Touche <strong>X</strong> pour inspecter</span>
+            </div>
+          </div>
+
+          <!-- Conteneur d'affichage du Canvas -->
+          <div class="world-viewport" id="world-viewport">
+            <canvas id="world-canvas" width="800" height="540"></canvas>
+
+            <!-- Contrôles Tactiles Mobiles par-dessus le Canvas -->
+            <div class="mobile-touch-layer" id="mobile-touch-layer">
+              <!-- D-Pad virtuel (croix directionnelle discrète en bas à gauche) -->
+              <div class="virtual-dpad" id="virtual-dpad" aria-label="Croix directionnelle tactile">
+                <button type="button" class="dpad-btn dpad-up" data-dir="up" aria-label="Haut">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                </button>
+                <div class="dpad-middle-row">
+                  <button type="button" class="dpad-btn dpad-left" data-dir="left" aria-label="Gauche">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                  </button>
+                  <div class="dpad-center-hub"></div>
+                  <button type="button" class="dpad-btn dpad-right" data-dir="right" aria-label="Droite">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                  </button>
+                </div>
+                <button type="button" class="dpad-btn dpad-down" data-dir="down" aria-label="Bas">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+              </div>
+
+              <!-- Bouton d'action X en bas à droite -->
+              <div class="virtual-action-zone">
+                <button type="button" class="action-btn-x" id="btn-mobile-action-x" aria-label="Inspecter">
+                  <span class="action-btn-letter">X</span>
+                  <span class="action-btn-sub">Inspecter</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -1789,7 +2321,7 @@
             <span class="feather-status-badge badge-unlocked" id="badge-game-1">Commencer</span>
           </div>
 
-          <!-- Jeu 2 : En développement -->
+          <!-- Jeu 2 : Bientôt disponible -->
           <div class="feather-slot slot-locked" id="slot-game-2" role="button" tabindex="0" aria-disabled="true">
             <div class="lock-corner-badge" title="Épreuve verrouillée">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1797,23 +2329,24 @@
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
             </div>
-            <div class="feather-icon-wrap" id="feather-icon-2" style="background: #eef5f0; color: #4e805d;">
+            <div class="feather-icon-wrap" id="feather-icon-2" style="background: #f4ede8; color: #8c736a;">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
             </div>
             <h2 class="feather-name">Épreuve 2</h2>
-            <p class="feather-desc">L'Officine de l'Apothicaire • Remèdes Secrets</p>
+            <p class="feather-desc">Le nom de la salle va être dévoilé bientôt.</p>
             <span class="feather-status-badge badge-locked" id="badge-game-2">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
-              En développement
+              Bientôt disponible
             </span>
           </div>
 
-          <!-- Jeu 3 : En développement -->
+          <!-- Jeu 3 : Bientôt disponible -->
           <div class="feather-slot slot-locked" id="slot-game-3" role="button" tabindex="0" aria-disabled="true">
             <div class="lock-corner-badge" title="Épreuve verrouillée">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1821,24 +2354,24 @@
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
             </div>
-            <div class="feather-icon-wrap" id="feather-icon-3" style="background: #f7eff1; color: #874955;">
+            <div class="feather-icon-wrap" id="feather-icon-3" style="background: #f4ede8; color: #8c736a;">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
             </div>
             <h2 class="feather-name">Épreuve 3</h2>
-            <p class="feather-desc">L'Ombre de Dostoïevski • La Citation Perdue</p>
+            <p class="feather-desc">Le nom de la salle va être dévoilé bientôt.</p>
             <span class="feather-status-badge badge-locked" id="badge-game-3">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
-              En développement
+              Bientôt disponible
             </span>
           </div>
 
-          <!-- Jeu 4 : En développement -->
+          <!-- Jeu 4 : Bientôt disponible -->
           <div class="feather-slot slot-locked" id="slot-game-4" role="button" tabindex="0" aria-disabled="true">
             <div class="lock-corner-badge" title="Épreuve verrouillée">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1846,23 +2379,24 @@
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
             </div>
-            <div class="feather-icon-wrap" id="feather-icon-4" style="background: #fdf6ec; color: #b8863b;">
+            <div class="feather-icon-wrap" id="feather-icon-4" style="background: #f4ede8; color: #8c736a;">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
             </div>
             <h2 class="feather-name">Épreuve 4</h2>
-            <p class="feather-desc">L'Astre du Petit Prince • L'Astéroïde B612</p>
+            <p class="feather-desc">Le nom de la salle va être dévoilé bientôt.</p>
             <span class="feather-status-badge badge-locked" id="badge-game-4">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
-              En développement
+              Bientôt disponible
             </span>
           </div>
 
-          <!-- Jeu 5 : En développement -->
+          <!-- Jeu 5 : Bientôt disponible -->
           <div class="feather-slot slot-locked" id="slot-game-5" role="button" tabindex="0" aria-disabled="true">
             <div class="lock-corner-badge" title="Épreuve verrouillée">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1870,19 +2404,20 @@
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
             </div>
-            <div class="feather-icon-wrap" id="feather-icon-5" style="background: #edf3f7; color: #4b6f88;">
+            <div class="feather-icon-wrap" id="feather-icon-5" style="background: #f4ede8; color: #8c736a;">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M2 12h20M2 18h20M2 6h20"></path>
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
             </div>
             <h2 class="feather-name">Épreuve 5</h2>
-            <p class="feather-desc">Le Cygne sur la Grève • Les Eaux Oubliées</p>
+            <p class="feather-desc">Le nom de la salle va être dévoilé bientôt.</p>
             <span class="feather-status-badge badge-locked" id="badge-game-5">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
-              En développement
+              Bientôt disponible
             </span>
           </div>
         </div>
@@ -1917,7 +2452,7 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
-            Menu des Plumes
+            Revenir au Monde
           </button>
           <span class="attempt-indicator">
             Tentative <span id="attempt-counter">1</span>/6
@@ -2039,176 +2574,114 @@
       </section>
 
       <!-- ===================================================
-           ÉPREUVE 2 : L'OFFICINE DE L'APOTHICAIRE
+           ÉPREUVES 2 À 5 : SALLES BIENTÔT DÉVOILÉES
            =================================================== -->
       <section id="jeu-2" class="screen" aria-label="Épreuve 2">
-        <div class="quest-card">
-          <button class="btn-back-hub" id="btn-back-hub-2" type="button" style="align-self: flex-start; margin-bottom: 12px;">
+        <div class="quest-card" style="text-align: center; padding: 36px 24px;">
+          <button class="btn-back-hub" id="btn-back-hub-2" type="button" style="align-self: flex-start; margin-bottom: 16px;">
             ← Menu
           </button>
-          <div class="quest-icon-badge" style="background: #e4efe7; color: #437651;">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          <div class="quest-icon-badge" style="background: #f4ede8; color: #8c736a; margin: 0 auto 16px;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
             </svg>
           </div>
-          <span class="quest-subtitle" style="color: #437651;">Épreuve 2 • Les Remèdes Secrets</span>
-          <h2 class="quest-title">L'Officine de l'Apothicaire</h2>
-          <p class="quest-poem-text">
-            « Sous l'ombre des champignons sauvages et des alambics en cuivre,<br />
-            l'apothicaire prépare le baume qui délivre.<br />
-            "Ni poison mortel de l'amanite, ni racine hurlante de mandragore...<br />
-            seule la plante sacrée qui purifie et apaise ouvre le coffre d'or." »
+          <span class="quest-subtitle" style="color: #8c736a;">Épreuve 2</span>
+          <h2 class="quest-title" style="margin-bottom: 12px;">Épreuve 2</h2>
+          <p class="quest-poem-text" style="font-style: italic; color: #705d55;">
+            Le nom de la salle va être dévoilé bientôt.
           </p>
-
-          <p style="font-size: 0.88rem; font-weight: 600; margin-bottom: 12px; color: #3b282c;">
-            Quelle fiole d'herboristerie contient l'élixir purificateur ?
-          </p>
-
-          <div class="options-grid two-cols">
-            <button type="button" class="option-btn" data-game="2" data-choice="amanite">
-              <span style="font-size: 20px;">🍄</span>
-              <span>L'Amanite</span>
-              <span style="font-size: 11px; color: #88726e;">Poison des bois</span>
-            </button>
-            <button type="button" class="option-btn" data-game="2" data-choice="sauge">
-              <span style="font-size: 20px;">🌿</span>
-              <span>La Sauge</span>
-              <span style="font-size: 11px; color: #88726e;">Herbe de guérison</span>
-            </button>
-            <button type="button" class="option-btn" data-game="2" data-choice="mandragore">
-              <span style="font-size: 20px;">🌱</span>
-              <span>La Mandragore</span>
-              <span style="font-size: 11px; color: #88726e;">Racine mystique</span>
-            </button>
-            <button type="button" class="option-btn" data-game="2" data-choice="ciguë">
-              <span style="font-size: 20px;">🥀</span>
-              <span>La Ciguë</span>
-              <span style="font-size: 11px; color: #88726e;">Fleur d'oubli</span>
-            </button>
-          </div>
-          <div id="game-2-feedback" class="error-msg"></div>
         </div>
       </section>
 
-      <!-- ===================================================
-           ÉPREUVE 3 : L'OMBRE DE DOSTOÏEVSKI
-           =================================================== -->
       <section id="jeu-3" class="screen" aria-label="Épreuve 3">
-        <div class="quest-card">
-          <button class="btn-back-hub" id="btn-back-hub-3" type="button" style="align-self: flex-start; margin-bottom: 12px;">
+        <div class="quest-card" style="text-align: center; padding: 36px 24px;">
+          <button class="btn-back-hub" id="btn-back-hub-3" type="button" style="align-self: flex-start; margin-bottom: 16px;">
             ← Menu
           </button>
-          <div class="quest-icon-badge" style="background: #f7eaed; color: #823847;">
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          <div class="quest-icon-badge" style="background: #f4ede8; color: #8c736a; margin: 0 auto 16px;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
             </svg>
           </div>
-          <span class="quest-subtitle" style="color: #823847;">Épreuve 3 • Le Mot de l'Auteur</span>
-          <h2 class="quest-title">L'Ombre de Dostoïevski</h2>
-          <p class="quest-poem-text">
-            « Dans les brumes de Saint-Pétersbourg, la plume lourde de l'écrivain a tracé cette prophétie dans <em>L'Idiot</em> :<br />
-            "La [......] sauvera le monde."<br />
-            Retrouvez le mot sacré pour éveiller la troisième plume. »
+          <span class="quest-subtitle" style="color: #8c736a;">Épreuve 3</span>
+          <h2 class="quest-title" style="margin-bottom: 12px;">Épreuve 3</h2>
+          <p class="quest-poem-text" style="font-style: italic; color: #705d55;">
+            Le nom de la salle va être dévoilé bientôt.
           </p>
-
-          <form id="form-game-3" class="input-zone" style="max-width: 360px;" autocomplete="off">
-            <input 
-              type="text" 
-              id="input-game-3" 
-              class="input-field" 
-              placeholder="Complétez la citation..." 
-              autocomplete="off"
-            />
-            <button type="submit" class="validate-btn" style="background: #823847;">Valider</button>
-          </form>
-          <p style="font-size: 11px; color: #8a7376; margin-top: 4px; font-style: italic;">
-            Indice : Mot féminin de 6 lettres (commence par B...)
-          </p>
-          <div id="game-3-feedback" class="error-msg"></div>
         </div>
       </section>
 
-      <!-- ===================================================
-           ÉPREUVE 4 : L'ASTRE DU PETIT PRINCE
-           =================================================== -->
       <section id="jeu-4" class="screen" aria-label="Épreuve 4">
-        <div class="quest-card">
-          <button class="btn-back-hub" id="btn-back-hub-4" type="button" style="align-self: flex-start; margin-bottom: 12px;">
+        <div class="quest-card" style="text-align: center; padding: 36px 24px;">
+          <button class="btn-back-hub" id="btn-back-hub-4" type="button" style="align-self: flex-start; margin-bottom: 16px;">
             ← Menu
           </button>
-          <div class="quest-icon-badge" style="background: #fdf3e5; color: #b5802a;">
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          <div class="quest-icon-badge" style="background: #f4ede8; color: #8c736a; margin: 0 auto 16px;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
             </svg>
           </div>
-          <span class="quest-subtitle" style="color: #b5802a;">Épreuve 4 • La Constellation Secrète</span>
-          <h2 class="quest-title">L'Astre du Petit Prince</h2>
-          <p class="quest-poem-text">
-            « "On ne voit bien qu'avec le cœur. L'essentiel est invisible pour les yeux."<br />
-            Sur quel astéroïde l'enfant aux cheveux d'or prenait-il soin de son unique rose ? »
+          <span class="quest-subtitle" style="color: #8c736a;">Épreuve 4</span>
+          <h2 class="quest-title" style="margin-bottom: 12px;">Épreuve 4</h2>
+          <p class="quest-poem-text" style="font-style: italic; color: #705d55;">
+            Le nom de la salle va être dévoilé bientôt.
           </p>
-
-          <div class="options-grid two-cols">
-            <button type="button" class="option-btn" data-game="4" data-choice="A101">
-              <span style="font-size: 18px;">🪐</span>
-              <span>Astro A-101</span>
-            </button>
-            <button type="button" class="option-btn" data-game="4" data-choice="B612">
-              <span style="font-size: 18px;">🌹</span>
-              <span>L'Astéroïde B-612</span>
-            </button>
-            <button type="button" class="option-btn" data-game="4" data-choice="C3PO">
-              <span style="font-size: 18px;">✨</span>
-              <span>Secteur C-300</span>
-            </button>
-            <button type="button" class="option-btn" data-game="4" data-choice="Z800">
-              <span style="font-size: 18px;">⭐</span>
-              <span>Étoile Z-800</span>
-            </button>
-          </div>
-          <div id="game-4-feedback" class="error-msg"></div>
         </div>
       </section>
 
-      <!-- ===================================================
-           ÉPREUVE 5 : LE CYGNE SUR LA GRÈVE
-           =================================================== -->
       <section id="jeu-5" class="screen" aria-label="Épreuve 5">
-        <div class="quest-card">
-          <button class="btn-back-hub" id="btn-back-hub-5" type="button" style="align-self: flex-start; margin-bottom: 12px;">
+        <div class="quest-card" style="text-align: center; padding: 36px 24px;">
+          <button class="btn-back-hub" id="btn-back-hub-5" type="button" style="align-self: flex-start; margin-bottom: 16px;">
             ← Menu
           </button>
-          <div class="quest-icon-badge" style="background: #e8f0f5; color: #3f6882;">
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M2 12h20M2 18h20M2 6h20"></path>
+          <div class="quest-icon-badge" style="background: #f4ede8; color: #8c736a; margin: 0 auto 16px;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
             </svg>
           </div>
-          <span class="quest-subtitle" style="color: #3f6882;">Épreuve 5 • L'Ultime Plume</span>
-          <h2 class="quest-title">Le Cygne sur la Grève</h2>
-          <p class="quest-poem-text">
-            « Écoute le murmure du ressac. Un majestueux oiseau blanc fend les eaux calmes.<br />
-            Remets les lettres du rivage dans l'ordre pour appeler la dernière plume :<br />
-            <strong>G - N - C - Y - E</strong> »
+          <span class="quest-subtitle" style="color: #8c736a;">Épreuve 5</span>
+          <h2 class="quest-title" style="margin-bottom: 12px;">Épreuve 5</h2>
+          <p class="quest-poem-text" style="font-style: italic; color: #705d55;">
+            Le nom de la salle va être dévoilé bientôt.
           </p>
-
-          <form id="form-game-5" class="input-zone" style="max-width: 360px;" autocomplete="off">
-            <input 
-              type="text" 
-              id="input-game-5" 
-              class="input-field" 
-              maxlength="5" 
-              placeholder="Mot de 5 lettres..." 
-              autocomplete="off"
-            />
-            <button type="submit" class="validate-btn" style="background: #3f6882;">Libérer</button>
-          </form>
-          <div id="game-5-feedback" class="error-msg"></div>
         </div>
       </section>
 
       <!-- Div finale vide (gardée pour l'architecture demandée) -->
       <div id="finale"></div>
+    </div>
+
+    <!-- Transition d'entrée poétique dans l'Épreuve 1 -->
+    <div id="trial-entrance-curtain" class="trial-entrance-curtain" aria-hidden="true">
+      <div class="curtain-content">
+        <div class="curtain-feather">🪶</div>
+        <p class="curtain-caption">Entrée dans la première épreuve...</p>
+      </div>
+    </div>
+
+    <!-- Transition de sortie poétique vers le Monde (style chargement / retour) -->
+    <div id="trial-exit-curtain" class="trial-exit-curtain" aria-hidden="true">
+      <div class="curtain-content">
+        <div class="exit-loading-ring">
+          <div class="exit-spinning-feather">🪶</div>
+        </div>
+        <p class="curtain-caption">Retour dans le monde...</p>
+      </div>
+    </div>
+
+    <!-- Modal d'inspection dans le monde pour les zones 2 à 5 -->
+    <div id="world-inspect-modal" class="world-inspect-modal" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="inspect-modal-card">
+        <div class="inspect-modal-icon" id="inspect-modal-icon">🔒</div>
+        <h3 class="inspect-modal-title" id="inspect-modal-title">Épreuve</h3>
+        <p class="inspect-modal-desc" id="inspect-modal-desc">Le nom de la salle va être dévoilé bientôt.</p>
+        <button type="button" class="btn-inspect-close" id="btn-inspect-close">Continuer l'exploration</button>
+      </div>
     </div>
 
     <!-- ===================================================
@@ -2330,6 +2803,7 @@
         const THEME_COLORS = {
           enveloppe: '#fdfbf7',
           intro: '#fdfbf7',
+          monde: '#e4f1e8',
           hub: '#f9e8eb',
           jeu1: '#fdf1f1',
           jeu2: '#eaf1ed',
@@ -2375,13 +2849,17 @@
         function flashSaveIndicator() {
           const el = document.getElementById('save-indicator');
           if (!el) return;
-          el.style.opacity = '1';
+          el.classList.add('saving-pulse');
+          setTimeout(() => {
+            el.classList.remove('saving-pulse');
+          }, 350);
         }
 
         // Références DOM
         const screens = {
           enveloppe: document.getElementById('ecran-enveloppe'),
           intro: document.getElementById('ecran-intro'),
+          monde: document.getElementById('ecran-monde'),
           hub: document.getElementById('ecran-hub'),
           jeu1: document.getElementById('jeu-1'),
           jeu2: document.getElementById('jeu-2'),
@@ -2409,14 +2887,62 @@
           }, 2800);
         }
 
-        // Navigation fiable sans aucun état intermédiaire invisible
+        let isEnteringTrial1 = false;
+        let isExitingTrial = false;
+
+        // Transition de sortie poétique de l'épreuve vers le Monde 2D (style chargement)
+        function returnToWorldFromTrial() {
+          if (isExitingTrial) return;
+          isExitingTrial = true;
+          const exitCurtain = document.getElementById('trial-exit-curtain');
+          if (exitCurtain) exitCurtain.classList.add('active');
+
+          setTimeout(() => {
+            performNavigation('monde', true);
+            if (window.WorldEngine && window.WorldEngine.spawnPlayerNearZone1) {
+              window.WorldEngine.spawnPlayerNearZone1();
+            }
+            setTimeout(() => {
+              if (exitCurtain) exitCurtain.classList.remove('active');
+              isExitingTrial = false;
+            }, 360);
+          }, 380);
+        }
+
+        // Navigation fiable avec transition d'immersion pour l'épreuve 1
         function navigateTo(screenKey, save = true) {
-          // Bloquer l'accès aux épreuves 2, 3, 4 et 5 en développement
+          // Bloquer l'accès direct aux épreuves 2, 3, 4 et 5 dont la salle va être dévoilée bientôt
           if (['jeu2', 'jeu3', 'jeu4', 'jeu5'].includes(screenKey)) {
-            showToast('🔒 Cette épreuve est actuellement en cours de développement.');
-            screenKey = 'hub';
+            showToast('🔒 Le nom de la salle va être dévoilé bientôt.');
+            screenKey = 'monde';
           }
 
+          // Transition élégante lors de l'entrée dans l'épreuve 1
+          if (screenKey === 'jeu1' && state.currentScreen !== 'jeu1' && !isEnteringTrial1) {
+            triggerTrialOneTransition(save);
+            return;
+          }
+
+          performNavigation(screenKey, save);
+        }
+
+        function triggerTrialOneTransition(save = true) {
+          isEnteringTrial1 = true;
+          const curtain = document.getElementById('trial-entrance-curtain');
+          if (curtain) {
+            curtain.classList.add('active');
+          }
+
+          setTimeout(() => {
+            performNavigation('jeu1', save);
+            setTimeout(() => {
+              if (curtain) curtain.classList.remove('active');
+              isEnteringTrial1 = false;
+            }, 200);
+          }, 320);
+        }
+
+        function performNavigation(screenKey, save = true) {
           const target = screens[screenKey];
           if (!target) return;
 
@@ -2439,11 +2965,22 @@
           // Remonter en haut de page pour le confort de lecture
           window.scrollTo({ top: 0, behavior: 'smooth' });
 
+          // Gestion du Monde 2D (démarrer / mettre en pause)
+          if (screenKey === 'monde') {
+            if (window.WorldEngine && window.WorldEngine.start) {
+              window.WorldEngine.start();
+            }
+          } else {
+            if (window.WorldEngine && window.WorldEngine.pause) {
+              window.WorldEngine.pause();
+            }
+          }
+
           // Spécificités par écran
           if (screenKey === 'jeu1') {
             if (!state.game1.isWon && !state.game1.isGameOver) {
               const input = document.getElementById('word-input');
-              if (input) setTimeout(() => input.focus(), 200);
+              if (input) setTimeout(() => input.focus(), 350);
             }
           }
         }
@@ -2472,7 +3009,7 @@
             }
           }
 
-          // Épreuves 2 à 5 : Toujours verrouillées avec cadenas et mention "En développement"
+          // Épreuves 2 à 5 : Toujours verrouillées avec mention "Bientôt disponible"
           for (let i = 2; i <= 5; i++) {
             const slot = document.getElementById(`slot-game-${i}`);
             const badge = document.getElementById(`badge-game-${i}`);
@@ -2486,7 +3023,7 @@
                   <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                   <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                 </svg>
-                En développement
+                Bientôt disponible
               `;
             }
           }
@@ -2528,36 +3065,44 @@
         const btnReplayIntroKeep = document.getElementById('btn-replay-intro-keep');
         const btnResetAllProgress = document.getElementById('btn-reset-all-progress');
 
-        btnShowRestartModal.addEventListener('click', () => {
-          restartModal.style.display = 'flex';
-        });
+        if (btnShowRestartModal) {
+          btnShowRestartModal.addEventListener('click', () => {
+            if (restartModal) restartModal.style.display = 'flex';
+          });
+        }
 
-        btnCancelRestart.addEventListener('click', () => {
-          restartModal.style.display = 'none';
-        });
+        if (btnCancelRestart) {
+          btnCancelRestart.addEventListener('click', () => {
+            if (restartModal) restartModal.style.display = 'none';
+          });
+        }
 
         // 1. Revoir l'histoire depuis le début sans perdre ses plumes
-        btnReplayIntroKeep.addEventListener('click', () => {
-          restartModal.style.display = 'none';
-          resetEnvelopeVisuals();
-          navigateTo('enveloppe');
-        });
+        if (btnReplayIntroKeep) {
+          btnReplayIntroKeep.addEventListener('click', () => {
+            if (restartModal) restartModal.style.display = 'none';
+            resetEnvelopeVisuals();
+            navigateTo('enveloppe');
+          });
+        }
 
         // 2. Tout réinitialiser à zéro
-        btnResetAllProgress.addEventListener('click', () => {
-          state = {
-            currentScreen: 'enveloppe',
-            feathers: { 1: false, 2: false, 3: false, 4: false, 5: false },
-            game1: { attempts: [], isWon: false, isGameOver: false, hasDancingLetters: false }
-          };
-          saveState();
-          updateFeathersUI();
-          restartGame1(false);
-          resetEnvelopeVisuals();
-          restartModal.style.display = 'none';
-          showToast('✨ L\'aventure a été réinitialisée depuis le début.');
-          navigateTo('enveloppe');
-        });
+        if (btnResetAllProgress) {
+          btnResetAllProgress.addEventListener('click', () => {
+            state = {
+              currentScreen: 'enveloppe',
+              feathers: { 1: false, 2: false, 3: false, 4: false, 5: false },
+              game1: { attempts: [], isWon: false, isGameOver: false, hasDancingLetters: false }
+            };
+            saveState();
+            updateFeathersUI();
+            restartGame1(false);
+            resetEnvelopeVisuals();
+            if (restartModal) restartModal.style.display = 'none';
+            showToast('✨ L\'aventure a été réinitialisée depuis le début.');
+            navigateTo('enveloppe');
+          });
+        }
 
         function resetEnvelopeVisuals() {
           const flap = document.getElementById('envelope-flap');
@@ -2583,47 +3128,1407 @@
           }, 450);
         }
 
-        btnOpenEnvelope.addEventListener('click', triggerOpenEnvelope);
-        btnOpenDirect.addEventListener('click', triggerOpenEnvelope);
-        btnOpenEnvelope.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            triggerOpenEnvelope();
-          }
-        });
+        if (btnOpenEnvelope) {
+          btnOpenEnvelope.addEventListener('click', triggerOpenEnvelope);
+          btnOpenEnvelope.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              triggerOpenEnvelope();
+            }
+          });
+        }
 
-        // Clic sur "Entrer dans le Cabinet" (Écran Intro)
-        document.getElementById('btn-start-quest').addEventListener('click', () => {
-          navigateTo('hub');
-        });
+        if (btnOpenDirect) {
+          btnOpenDirect.addEventListener('click', triggerOpenEnvelope);
+        }
 
-        // Navigation rapide en haut
-        document.getElementById('nav-brand-title').addEventListener('click', () => {
-          navigateTo('hub');
-        });
-        document.getElementById('nav-hub-btn').addEventListener('click', () => {
-          navigateTo('hub');
-        });
+        // Clic sur "Entrer dans le Monde" (Écran Intro)
+        const btnStartQuest = document.getElementById('btn-start-quest');
+        if (btnStartQuest) {
+          btnStartQuest.addEventListener('click', () => {
+            navigateTo('monde');
+          });
+        }
+
+        // Navigation rapide en haut vers le Monde
+        const navBrandTitle = document.getElementById('nav-brand-title');
+        if (navBrandTitle) {
+          navBrandTitle.addEventListener('click', () => {
+            navigateTo('monde');
+          });
+        }
+
+        const navHubBtn = document.getElementById('nav-hub-btn');
+        if (navHubBtn) {
+          navHubBtn.addEventListener('click', () => {
+            navigateTo('monde');
+          });
+        }
 
         // Accès aux jeux depuis le Hub : Uniquement Jeu 1 accessible
-        document.getElementById('slot-game-1').addEventListener('click', () => navigateTo('jeu1'));
+        const slotGame1 = document.getElementById('slot-game-1');
+        if (slotGame1) {
+          slotGame1.addEventListener('click', () => navigateTo('jeu1'));
+          slotGame1.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              navigateTo('jeu1');
+            }
+          });
+        }
 
         const lockedSlotNotice = () => {
-          showToast('🔒 Cette épreuve est actuellement en cours de développement.');
+          showToast('🔒 Le nom de la salle va être dévoilé bientôt.');
         };
 
         for (let i = 2; i <= 5; i++) {
           const slot = document.getElementById(`slot-game-${i}`);
           if (slot) {
             slot.addEventListener('click', lockedSlotNotice);
+            slot.addEventListener('keydown', (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                lockedSlotNotice();
+              }
+            });
           }
         }
 
-        // Boutons retour au Hub
+        // Boutons retour depuis les épreuves : Retour au Monde
         for (let i = 1; i <= 5; i++) {
           const b = document.getElementById(`btn-back-hub-${i}`);
-          if (b) b.addEventListener('click', () => navigateTo('hub'));
+          if (b) {
+            b.addEventListener('click', () => {
+              if (i === 1) {
+                returnToWorldFromTrial();
+              } else {
+                navigateTo('monde');
+              }
+            });
+          }
         }
+
+        // ===================================================
+        // MOTEUR DU MONDE 2D (CANVAS API & FLÂNERIE TOP-DOWN)
+        // ===================================================
+        const WorldEngine = (function () {
+          const canvas = document.getElementById('world-canvas');
+          let ctx = null;
+          let animFrameId = null;
+          let isRunning = false;
+          let isPaused = false;
+          let walkCycle = 0;
+          let lastTimestamp = 0;
+
+          const WORLD_WIDTH = 800;
+          const WORLD_HEIGHT = 540;
+
+          // Définition des 5 Zones poétiques
+          const ZONES = [
+            {
+              id: 1,
+              key: 'jeu1',
+              name: 'Zone 1 • La Littérature',
+              shortTitle: 'L\'Énigme Littéraire',
+              icon: '🪶',
+              x: 185,
+              y: 155,
+              radius: 56,
+              accessible: true,
+              desc: "Sol pavé gris-bleu, lampadaire parisien et livre mystère sur piédestal d'ivoire."
+            },
+            {
+              id: 2,
+              key: 'jeu2',
+              name: 'Zone 2 • L\'Apothicaire',
+              shortTitle: 'L\'Officine Botanique',
+              icon: '🍄',
+              x: 615,
+              y: 150,
+              radius: 56,
+              accessible: false,
+              desc: "Herbe vert sauge, petits champignons sauvages et flacons d'essences."
+            },
+            {
+              id: 3,
+              key: 'jeu3',
+              name: 'Zone 3 • Le Bassin des Cygnes',
+              shortTitle: 'L\'Étang des Cygnes',
+              icon: '🦢',
+              x: 615,
+              y: 395,
+              radius: 60,
+              accessible: false,
+              desc: "Étang circulaire azur, nénuphars et cygnes majestueux aux reflets d'argent."
+            },
+            {
+              id: 4,
+              key: 'jeu4',
+              name: 'Zone 4 • L\'Astéroïde du Petit Prince',
+              shortTitle: 'La Rose & l\'Astéroïde',
+              icon: '🌹',
+              x: 185,
+              y: 395,
+              radius: 56,
+              accessible: false,
+              desc: "Sable doré d'un monde lointain, cloche de verre protégeant une rose secrète."
+            },
+            {
+              id: 5,
+              key: 'jeu5',
+              name: 'Zone 5 • Le Rivage d\'Or',
+              shortTitle: 'La Plage & l\'Océan',
+              icon: '🌊',
+              x: 400,
+              y: 460,
+              radius: 58,
+              accessible: false,
+              desc: "Bordure de sable fin caressée par le ressac turquoise et ponton de bois flotté."
+            }
+          ];
+
+          // État du Joueur conforme aux instructions de conception
+          const player = {
+            x: 400,
+            y: 260,
+            speed: 2.8,
+            dir: 'down', // 'down' (face), 'up' (dos), 'left' (gauche), 'right' (droite)
+            isMoving: false,
+            spawnBurst: 0 // animation d'apparition triomphante
+          };
+
+          const keysDown = {
+            up: false,
+            down: false,
+            left: false,
+            right: false
+          };
+
+          let activeZone = null;
+
+          // Particules ambiantes (pétales de fleurs pastel au vent)
+          const petals = [];
+          for (let i = 0; i < 22; i++) {
+            petals.push({
+              x: Math.random() * WORLD_WIDTH,
+              y: Math.random() * WORLD_HEIGHT,
+              r: 2.2 + Math.random() * 2.6,
+              vx: 0.35 + Math.random() * 0.45,
+              vy: 0.15 + Math.random() * 0.3,
+              phase: Math.random() * Math.PI * 2,
+              wobbleSpeed: 0.02 + Math.random() * 0.025,
+              color: ['#fce7e7', '#fde2e4', '#e2ece9', '#fff3da'][Math.floor(Math.random() * 4)],
+              alpha: 0.35 + Math.random() * 0.4
+            });
+          }
+
+          // Étincelles magiques de la Zone 1 (Littérature)
+          const sparks = [];
+          for (let i = 0; i < 14; i++) {
+            sparks.push({
+              angle: Math.random() * Math.PI * 2,
+              dist: 18 + Math.random() * 32,
+              speed: 0.016 + Math.random() * 0.022,
+              r: 1.2 + Math.random() * 1.6,
+              alpha: 0.3 + Math.random() * 0.7
+            });
+          }
+
+          function init() {
+            if (!canvas) return;
+            ctx = canvas.getContext('2d');
+            setupControls();
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+          }
+
+          function resizeCanvas() {
+            if (!canvas) return;
+            canvas.width = WORLD_WIDTH;
+            canvas.height = WORLD_HEIGHT;
+          }
+
+          function setupControls() {
+            // Clavier PC (Flèches, ZQSD, WASD, Touche X, Touche E, Espace, Entrée)
+            window.addEventListener('keydown', handleKeyDown);
+            window.addEventListener('keyup', handleKeyUp);
+
+            // D-Pad tactile Mobile
+            const dpadButtons = document.querySelectorAll('.dpad-btn');
+            dpadButtons.forEach(btn => {
+              const dir = btn.getAttribute('data-dir');
+              const onStart = (e) => {
+                e.preventDefault();
+                btn.classList.add('active');
+                if (dir && keysDown.hasOwnProperty(dir)) keysDown[dir] = true;
+              };
+              const onEnd = (e) => {
+                e.preventDefault();
+                btn.classList.remove('active');
+                if (dir && keysDown.hasOwnProperty(dir)) keysDown[dir] = false;
+              };
+              btn.addEventListener('pointerdown', onStart);
+              btn.addEventListener('pointerup', onEnd);
+              btn.addEventListener('pointerleave', onEnd);
+              btn.addEventListener('pointercancel', onEnd);
+            });
+
+            // Bouton Action X tactile Mobile
+            const btnActionX = document.getElementById('btn-mobile-action-x');
+            if (btnActionX) {
+              btnActionX.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                btnActionX.classList.add('active');
+                interact();
+              });
+              const clearActive = () => btnActionX.classList.remove('active');
+              btnActionX.addEventListener('pointerup', clearActive);
+              btnActionX.addEventListener('pointerleave', clearActive);
+              btnActionX.addEventListener('pointercancel', clearActive);
+            }
+
+            // Fermeture de la modal d'inspection
+            const btnCloseModal = document.getElementById('btn-inspect-close');
+            const inspectModal = document.getElementById('world-inspect-modal');
+            if (btnCloseModal && inspectModal) {
+              btnCloseModal.addEventListener('click', () => {
+                inspectModal.classList.remove('active');
+                isPaused = false;
+              });
+              inspectModal.addEventListener('click', (e) => {
+                if (e.target === inspectModal) {
+                  inspectModal.classList.remove('active');
+                  isPaused = false;
+                }
+              });
+            }
+          }
+
+          function handleKeyDown(e) {
+            if (!screens.monde || !screens.monde.classList.contains('active')) return;
+
+            const inspectModal = document.getElementById('world-inspect-modal');
+            if (inspectModal && inspectModal.classList.contains('active')) {
+              if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                inspectModal.classList.remove('active');
+                isPaused = false;
+              }
+              return;
+            }
+
+            let captured = true;
+            switch (e.code) {
+              case 'ArrowUp':
+              case 'KeyW':
+              case 'KeyZ':
+                keysDown.up = true;
+                break;
+              case 'ArrowDown':
+              case 'KeyS':
+                keysDown.down = true;
+                break;
+              case 'ArrowLeft':
+              case 'KeyA':
+              case 'KeyQ':
+                keysDown.left = true;
+                break;
+              case 'ArrowRight':
+              case 'KeyD':
+                keysDown.right = true;
+                break;
+              case 'KeyX':
+              case 'KeyE':
+              case 'Space':
+              case 'Enter':
+                interact();
+                break;
+              default:
+                captured = false;
+            }
+
+            if (captured && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.key)) {
+              e.preventDefault();
+            }
+          }
+
+          function handleKeyUp(e) {
+            switch (e.code) {
+              case 'ArrowUp':
+              case 'KeyW':
+              case 'KeyZ':
+                keysDown.up = false;
+                break;
+              case 'ArrowDown':
+              case 'KeyS':
+                keysDown.down = false;
+                break;
+              case 'ArrowLeft':
+              case 'KeyA':
+              case 'KeyQ':
+                keysDown.left = false;
+                break;
+              case 'ArrowRight':
+              case 'KeyD':
+                keysDown.right = false;
+                break;
+            }
+          }
+
+          function interact() {
+            if (!activeZone) return;
+
+            if (activeZone.id === 1) {
+              // Zone 1 : Entrée dans l'épreuve de littérature (avec transition poétique)
+              isPaused = true;
+              navigateTo('jeu1');
+            } else {
+              // Zones 2 à 5 : Information que le nom de la salle va être dévoilé bientôt
+              isPaused = true;
+              const modal = document.getElementById('world-inspect-modal');
+              const title = document.getElementById('inspect-modal-title');
+              const desc = document.getElementById('inspect-modal-desc');
+              const icon = document.getElementById('inspect-modal-icon');
+              if (modal) {
+                if (title) title.textContent = activeZone.name;
+                if (desc) desc.textContent = 'Le nom de la salle va être dévoilé bientôt.';
+                if (icon) icon.textContent = activeZone.icon;
+                modal.classList.add('active');
+              }
+            }
+          }
+
+          function start() {
+            isPaused = false;
+            if (!isRunning) {
+              isRunning = true;
+              lastTimestamp = performance.now();
+              animFrameId = requestAnimationFrame(loop);
+            }
+          }
+
+          function pause() {
+            isPaused = true;
+            keysDown.up = false;
+            keysDown.down = false;
+            keysDown.left = false;
+            keysDown.right = false;
+            player.isMoving = false;
+          }
+
+          function spawnPlayerNearZone1() {
+            player.x = 215;
+            player.y = 195;
+            player.dir = 'down';
+            player.isMoving = false;
+            player.spawnBurst = 1.0;
+            start();
+          }
+
+          function update(delta) {
+            if (isPaused) return;
+
+            let vx = 0;
+            let vy = 0;
+
+            if (keysDown.up) vy -= 1;
+            if (keysDown.down) vy += 1;
+            if (keysDown.left) vx -= 1;
+            if (keysDown.right) vx += 1;
+
+            if (vx !== 0 && vy !== 0) {
+              const factor = 0.7071;
+              vx *= factor;
+              vy *= factor;
+            }
+
+            player.isMoving = vx !== 0 || vy !== 0;
+
+            if (player.isMoving) {
+              walkCycle += delta * 0.012;
+
+              if (Math.abs(vx) > Math.abs(vy)) {
+                player.dir = vx > 0 ? 'right' : 'left';
+              } else if (vy !== 0) {
+                player.dir = vy > 0 ? 'down' : 'up';
+              }
+
+              const nextX = player.x + vx * player.speed;
+              const nextY = player.y + vy * player.speed;
+
+              // Collision avec les bords du monde
+              if (nextX >= 32 && nextX <= WORLD_WIDTH - 32) {
+                player.x = nextX;
+              }
+              if (nextY >= 40 && nextY <= WORLD_HEIGHT - 38) {
+                player.y = nextY;
+              }
+
+              // Collision avec le cœur du bassin des cygnes (Zone 3)
+              const pondCenter = { x: 615, y: 395 };
+              const distToPond = Math.hypot(player.x - pondCenter.x, player.y - pondCenter.y);
+              const pondInnerRadius = 38;
+              if (distToPond < pondInnerRadius) {
+                const angle = Math.atan2(player.y - pondCenter.y, player.x - pondCenter.x);
+                player.x = pondCenter.x + Math.cos(angle) * pondInnerRadius;
+                player.y = pondCenter.y + Math.sin(angle) * pondInnerRadius;
+              }
+            }
+
+            // Détection de proximité des 5 Zones
+            activeZone = null;
+            let nearestDist = Infinity;
+            for (const zone of ZONES) {
+              const d = Math.hypot(player.x - zone.x, player.y - zone.y);
+              if (d <= zone.radius + 18) {
+                if (d < nearestDist) {
+                  nearestDist = d;
+                  activeZone = zone;
+                }
+              }
+            }
+
+            // Mise à jour de l'interface d'ambiance
+            const zoneTextEl = document.getElementById('world-zone-text');
+            if (zoneTextEl) {
+              if (activeZone) {
+                zoneTextEl.textContent = activeZone.name;
+              } else {
+                zoneTextEl.textContent = "Promenade dans le Monde";
+              }
+            }
+
+            // Animation tactile du bouton d'action X
+            const btnActionX = document.getElementById('btn-mobile-action-x');
+            if (btnActionX) {
+              btnActionX.classList.toggle('pulsing', !!activeZone);
+            }
+
+            // Particules de sortie d'épreuve
+            if (player.spawnBurst > 0) {
+              player.spawnBurst = Math.max(0, player.spawnBurst - delta * 0.0016);
+            }
+
+            // Pétales portés par le vent
+            for (const petal of petals) {
+              petal.phase += petal.wobbleSpeed;
+              petal.x += petal.vx;
+              petal.y += petal.vy + Math.sin(petal.phase) * 0.25;
+              if (petal.x > WORLD_WIDTH + 10) petal.x = -10;
+              if (petal.y > WORLD_HEIGHT + 10) petal.y = -10;
+            }
+
+            // Étincelles de la Zone 1
+            for (const spark of sparks) {
+              spark.angle += spark.speed;
+            }
+          }
+
+          function loop(timestamp) {
+            const delta = Math.min(timestamp - lastTimestamp, 40);
+            lastTimestamp = timestamp;
+
+            update(delta);
+            render(timestamp);
+
+            if (screens.monde && screens.monde.classList.contains('active')) {
+              animFrameId = requestAnimationFrame(loop);
+            } else {
+              isRunning = false;
+            }
+          }
+
+          function render(time) {
+            if (!ctx) return;
+
+            ctx.clearRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+
+            // 1. Décors de fond (Carte, chemins, zones)
+            drawBackground(ctx, time);
+            drawPaths(ctx);
+            drawZones(ctx, time);
+
+            // 2. Décors de nature
+            drawNature(ctx, time);
+
+            // 3. Personnage (Vecteur flat design fidèle)
+            drawPlayer(ctx, player.x, player.y, player.dir, walkCycle, player.isMoving);
+
+            // 4. Effet d'aura lors du retour d'épreuve
+            if (player.spawnBurst > 0) {
+              drawSpawnAura(ctx, player.x, player.y, player.spawnBurst);
+            }
+
+            // 5. Bulle d'interaction au-dessus du joueur
+            if (activeZone) {
+              drawInteractionPrompt(ctx, player.x, player.y, activeZone, time);
+            }
+
+            // 6. Pétales légers flottant au premier plan
+            drawPetals(ctx);
+          }
+
+          function drawBackground(ctx, time) {
+            ctx.fillStyle = '#e4f1e8';
+            ctx.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+
+            ctx.fillStyle = '#ebf6ef';
+            ctx.beginPath();
+            ctx.ellipse(320, 200, 180, 110, 0.2, 0, Math.PI * 2);
+            ctx.ellipse(500, 320, 160, 95, -0.15, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#cbe2d3';
+            ctx.lineWidth = 1.4;
+            const tufts = [
+              [110, 240], [280, 110], [420, 170], [310, 340], [490, 220],
+              [710, 260], [260, 480], [670, 480], [70, 360], [530, 90]
+            ];
+            tufts.forEach(([tx, ty]) => {
+              ctx.beginPath();
+              ctx.moveTo(tx - 3, ty);
+              ctx.lineTo(tx, ty - 6);
+              ctx.moveTo(tx, ty);
+              ctx.lineTo(tx + 3, ty - 7);
+              ctx.stroke();
+            });
+          }
+
+          function drawPaths(ctx) {
+            const center = { x: 400, y: 260 };
+            ctx.save();
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            ctx.strokeStyle = '#e2d5c3';
+            ctx.lineWidth = 36;
+            ZONES.forEach(z => {
+              ctx.beginPath();
+              ctx.moveTo(center.x, center.y);
+              const cx = (center.x + z.x) / 2 + (z.y < center.y ? 15 : -15);
+              const cy = (center.y + z.y) / 2;
+              ctx.quadraticCurveTo(cx, cy, z.x, z.y);
+              ctx.stroke();
+            });
+
+            ctx.strokeStyle = '#f3ebe0';
+            ctx.lineWidth = 30;
+            ZONES.forEach(z => {
+              ctx.beginPath();
+              ctx.moveTo(center.x, center.y);
+              const cx = (center.x + z.x) / 2 + (z.y < center.y ? 15 : -15);
+              const cy = (center.y + z.y) / 2;
+              ctx.quadraticCurveTo(cx, cy, z.x, z.y);
+              ctx.stroke();
+            });
+
+            ctx.fillStyle = '#f3ebe0';
+            ctx.beginPath();
+            ctx.arc(center.x, center.y, 38, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#e2d5c3';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            ctx.fillStyle = '#d4c2af';
+            ctx.beginPath();
+            ctx.arc(center.x, center.y, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+          }
+
+          function drawZones(ctx, time) {
+            // Zone 1 : Littérature
+            const z1 = ZONES[0];
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(z1.x, z1.y, z1.radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#d2dde8';
+            ctx.fill();
+            ctx.strokeStyle = '#bac9d8';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            ctx.strokeStyle = '#bfcee0';
+            ctx.lineWidth = 1.2;
+            for (let r = -36; r <= 36; r += 16) {
+              for (let c = -36; c <= 36; c += 18) {
+                if (r * r + c * c < 46 * 46) {
+                  ctx.strokeRect(z1.x + c - 7, z1.y + r - 5, 14, 10);
+                }
+              }
+            }
+
+            const lampX = z1.x - 30;
+            const lampY = z1.y - 20;
+            const lampGlow = ctx.createRadialGradient(lampX, lampY - 26, 2, lampX, lampY - 26, 70);
+            lampGlow.addColorStop(0, 'rgba(255, 247, 215, 0.45)');
+            lampGlow.addColorStop(0.5, 'rgba(255, 238, 175, 0.16)');
+            lampGlow.addColorStop(1, 'rgba(255, 238, 175, 0)');
+            ctx.fillStyle = lampGlow;
+            ctx.beginPath();
+            ctx.arc(lampX, lampY - 26, 70, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#392d27';
+            ctx.fillRect(lampX - 1.5, lampY - 24, 3, 32);
+            ctx.beginPath();
+            ctx.arc(lampX, lampY + 8, 4.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#e8ba55';
+            ctx.beginPath();
+            ctx.roundRect(lampX - 4.5, lampY - 30, 9, 8, 2);
+            ctx.fill();
+            ctx.strokeStyle = '#392d27';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(lampX - 4.5, lampY - 30, 9, 8);
+
+            ctx.fillStyle = '#392d27';
+            ctx.beginPath();
+            ctx.moveTo(lampX - 6.5, lampY - 30);
+            ctx.lineTo(lampX, lampY - 36);
+            ctx.lineTo(lampX + 6.5, lampY - 30);
+            ctx.closePath();
+            ctx.fill();
+
+            const pedX = z1.x + 12;
+            const pedY = z1.y + 2;
+            ctx.fillStyle = '#ede6dd';
+            ctx.beginPath();
+            ctx.roundRect(pedX - 14, pedY + 4, 28, 14, 3);
+            ctx.fill();
+            ctx.strokeStyle = '#d7cab8';
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+
+            // Livre ouvert
+            ctx.fillStyle = '#782b34';
+            ctx.beginPath();
+            ctx.moveTo(pedX, pedY + 4);
+            ctx.lineTo(pedX - 12, pedY);
+            ctx.lineTo(pedX - 11, pedY - 9);
+            ctx.lineTo(pedX, pedY - 6);
+            ctx.lineTo(pedX + 11, pedY - 9);
+            ctx.lineTo(pedX + 12, pedY);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = '#faf7ee';
+            ctx.beginPath();
+            ctx.moveTo(pedX, pedY + 2);
+            ctx.lineTo(pedX - 11, pedY - 1);
+            ctx.lineTo(pedX - 10, pedY - 8);
+            ctx.lineTo(pedX, pedY - 5);
+            ctx.lineTo(pedX + 10, pedY - 8);
+            ctx.lineTo(pedX + 11, pedY - 1);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.strokeStyle = '#b8944d';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(pedX, pedY - 5);
+            ctx.lineTo(pedX, pedY + 2);
+            ctx.stroke();
+
+            const featherBob = Math.sin(time * 0.0035) * 3;
+            const featherX = pedX;
+            const featherY = pedY - 18 + featherBob;
+
+            const isWon = !!state.feathers[1];
+            ctx.fillStyle = isWon ? 'rgba(224, 182, 90, 0.4)' : 'rgba(230, 215, 185, 0.3)';
+            ctx.beginPath();
+            ctx.arc(featherX, featherY, 12, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.save();
+            ctx.translate(featherX, featherY);
+            ctx.rotate(0.35 + Math.sin(time * 0.002) * 0.08);
+            ctx.fillStyle = isWon ? '#dfa73b' : '#cfa862';
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 3.5, 9, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.moveTo(0, -9);
+            ctx.lineTo(0, 11);
+            ctx.stroke();
+            ctx.restore();
+
+            sparks.forEach(s => {
+              const sx = z1.x + Math.cos(s.angle) * s.dist;
+              const sy = z1.y + Math.sin(s.angle) * s.dist * 0.65;
+              const sa = Math.abs(Math.sin(time * 0.003 + s.angle)) * s.alpha;
+              ctx.fillStyle = `rgba(225, 175, 75, ${sa})`;
+              ctx.beginPath();
+              ctx.arc(sx, sy, s.r, 0, Math.PI * 2);
+              ctx.fill();
+            });
+            ctx.restore();
+
+            // Zone 2 : Apothicaire
+            const z2 = ZONES[1];
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(z2.x, z2.y, z2.radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#c5ded1';
+            ctx.fill();
+            ctx.strokeStyle = '#a8ccb9';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            const stumpX = z2.x - 8;
+            const stumpY = z2.y - 6;
+            ctx.fillStyle = '#9c775a';
+            ctx.beginPath();
+            ctx.ellipse(stumpX, stumpY + 6, 16, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#825f44';
+            ctx.fillRect(stumpX - 16, stumpY + 6, 32, 10);
+            ctx.fillStyle = '#c5a383';
+            ctx.beginPath();
+            ctx.ellipse(stumpX, stumpY + 6, 14, 6.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#9c775a';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.ellipse(stumpX, stumpY + 6, 8, 3.5, 0, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.fillStyle = '#7bb2a2';
+            ctx.beginPath();
+            ctx.roundRect(stumpX + 2, stumpY - 2, 7, 9, 2);
+            ctx.fill();
+            ctx.fillStyle = '#b38f6d';
+            ctx.fillRect(stumpX + 3.5, stumpY - 5, 4, 3);
+
+            const m1x = z2.x + 18;
+            const m1y = z2.y + 12;
+            ctx.fillStyle = '#f8f4ec';
+            ctx.fillRect(m1x - 2, m1y, 4, 8);
+            ctx.fillStyle = '#dc5858';
+            ctx.beginPath();
+            ctx.arc(m1x, m1y, 7, Math.PI, 0);
+            ctx.fill();
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(m1x - 3, m1y - 3, 1.2, 0, Math.PI * 2);
+            ctx.arc(m1x + 2.5, m1y - 4, 1.2, 0, Math.PI * 2);
+            ctx.fill();
+
+            const m2x = z2.x - 22;
+            const m2y = z2.y + 16;
+            ctx.fillStyle = '#f8f4ec';
+            ctx.fillRect(m2x - 1.5, m2y, 3, 6);
+            ctx.fillStyle = '#8f7fa7';
+            ctx.beginPath();
+            ctx.arc(m2x, m2y, 5.5, Math.PI, 0);
+            ctx.fill();
+
+            const m3x = z2.x + 24;
+            const m3y = z2.y - 14;
+            ctx.fillStyle = '#f8f4ec';
+            ctx.fillRect(m3x - 1.5, m3y, 3, 6);
+            ctx.fillStyle = '#e4ac4a';
+            ctx.beginPath();
+            ctx.arc(m3x, m3y, 5, Math.PI, 0);
+            ctx.fill();
+
+            ctx.strokeStyle = '#5a896a';
+            ctx.lineWidth = 1.3;
+            ctx.beginPath();
+            ctx.moveTo(z2.x - 14, z2.y + 24);
+            ctx.lineTo(z2.x - 10, z2.y + 12);
+            ctx.moveTo(z2.x - 6, z2.y + 25);
+            ctx.lineTo(z2.x - 4, z2.y + 14);
+            ctx.stroke();
+            ctx.fillStyle = '#927ebd';
+            ctx.beginPath();
+            ctx.arc(z2.x - 10, z2.y + 11, 2, 0, Math.PI * 2);
+            ctx.arc(z2.x - 4, z2.y + 13, 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+
+            // Zone 3 : Cygnes
+            const z3 = ZONES[2];
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(z3.x, z3.y, z3.radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#a6d3c2';
+            ctx.fill();
+
+            const pondRadius = 46;
+            ctx.beginPath();
+            ctx.arc(z3.x, z3.y, pondRadius, 0, Math.PI * 2);
+            ctx.fillStyle = '#bce2f5';
+            ctx.fill();
+            ctx.strokeStyle = '#9fd2ec';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            const rippleR1 = (time * 0.015) % 36;
+            const rippleA1 = Math.max(0, 1 - rippleR1 / 36) * 0.35;
+            ctx.strokeStyle = `rgba(255, 255, 255, ${rippleA1})`;
+            ctx.lineWidth = 1.4;
+            ctx.beginPath();
+            ctx.arc(z3.x, z3.y, rippleR1, 0, Math.PI * 2);
+            ctx.stroke();
+
+            const pad1X = z3.x - 18;
+            const pad1Y = z3.y + 14;
+            ctx.fillStyle = '#6f9d78';
+            ctx.beginPath();
+            ctx.arc(pad1X, pad1Y, 7.5, 0.4, Math.PI * 2 - 0.4);
+            ctx.lineTo(pad1X, pad1Y);
+            ctx.fill();
+            ctx.fillStyle = '#f0a8b9';
+            ctx.beginPath();
+            ctx.arc(pad1X, pad1Y - 1, 2.8, 0, Math.PI * 2);
+            ctx.fill();
+
+            const swanBob = Math.sin(time * 0.003) * 1.5;
+            const s1x = z3.x + 8;
+            const s1y = z3.y - 10 + swanBob;
+
+            ctx.fillStyle = 'rgba(120, 175, 205, 0.25)';
+            ctx.beginPath();
+            ctx.ellipse(s1x, s1y + 6, 8, 3.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.ellipse(s1x, s1y, 7.5, 5, -0.1, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.lineWidth = 2.2;
+            ctx.strokeStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.moveTo(s1x + 4, s1y - 1);
+            ctx.quadraticCurveTo(s1x + 8, s1y - 9, s1x + 4, s1y - 10);
+            ctx.stroke();
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(s1x + 4, s1y - 10, 2.2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#f08938';
+            ctx.beginPath();
+            ctx.moveTo(s1x + 3.5, s1y - 10);
+            ctx.lineTo(s1x + 1, s1y - 9.5);
+            ctx.lineTo(s1x + 3.5, s1y - 9);
+            ctx.closePath();
+            ctx.fill();
+
+            const s2x = z3.x - 14;
+            const s2y = z3.y - 12 - swanBob * 0.8;
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.ellipse(s2x, s2y, 5.5, 3.8, 0.15, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.lineWidth = 1.8;
+            ctx.strokeStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.moveTo(s2x - 3, s2y);
+            ctx.quadraticCurveTo(s2x - 6, s2y - 6, s2x - 3, s2y - 7);
+            ctx.stroke();
+            ctx.fillStyle = '#f08938';
+            ctx.fillRect(s2x - 1.5, s2y - 7.5, 2, 1.2);
+            ctx.restore();
+
+            // Zone 4 : Petit Prince
+            const z4 = ZONES[3];
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(z4.x, z4.y, z4.radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#fae6b5';
+            ctx.fill();
+            ctx.strokeStyle = '#e8d098';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            ctx.fillStyle = '#edd298';
+            ctx.beginPath();
+            ctx.arc(z4.x - 22, z4.y - 16, 7, 0, Math.PI * 2);
+            ctx.arc(z4.x + 24, z4.y + 18, 9, 0, Math.PI * 2);
+            ctx.arc(z4.x - 14, z4.y + 24, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            const stars = [
+              [z4.x - 26, z4.y + 6],
+              [z4.x + 18, z4.y - 24],
+              [z4.x + 28, z4.y - 6],
+              [z4.x - 6, z4.y - 28]
+            ];
+            ctx.fillStyle = '#f5c84c';
+            stars.forEach(([sx, sy]) => {
+              ctx.beginPath();
+              ctx.arc(sx, sy, 1.8, 0, Math.PI * 2);
+              ctx.fill();
+            });
+
+            const clocheX = z4.x;
+            const clocheY = z4.y - 2;
+            ctx.fillStyle = '#9e6d4c';
+            ctx.beginPath();
+            ctx.roundRect(clocheX - 12, clocheY + 12, 24, 5, 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#4e855c';
+            ctx.lineWidth = 1.8;
+            ctx.beginPath();
+            ctx.moveTo(clocheX, clocheY + 12);
+            ctx.quadraticCurveTo(clocheX + 3, clocheY + 4, clocheX, clocheY - 2);
+            ctx.stroke();
+
+            ctx.fillStyle = '#4e855c';
+            ctx.beginPath();
+            ctx.ellipse(clocheX - 3.5, clocheY + 6, 3, 1.4, -0.4, 0, Math.PI * 2);
+            ctx.ellipse(clocheX + 3.5, clocheY + 4, 3, 1.4, 0.4, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#d63447';
+            ctx.beginPath();
+            ctx.arc(clocheX, clocheY - 4, 4.8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#b72436';
+            ctx.beginPath();
+            ctx.arc(clocheX, clocheY - 5, 2.2, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = 'rgba(215, 240, 255, 0.42)';
+            ctx.beginPath();
+            ctx.arc(clocheX, clocheY, 12, Math.PI, 0);
+            ctx.lineTo(clocheX + 12, clocheY + 12);
+            ctx.lineTo(clocheX - 12, clocheY + 12);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(180, 220, 245, 0.8)';
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+            ctx.lineWidth = 1.4;
+            ctx.beginPath();
+            ctx.arc(clocheX, clocheY, 10, -Math.PI * 0.85, -Math.PI * 0.45);
+            ctx.stroke();
+            ctx.restore();
+
+            // Zone 5 : Plage & Océan
+            const z5 = ZONES[4];
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(z5.x, z5.y, z5.radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#f7e1ba';
+            ctx.fill();
+            ctx.strokeStyle = '#e6cb9d';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            const seaY = z5.y + 12;
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(z5.x, z5.y, z5.radius, 0, Math.PI);
+            ctx.clip();
+
+            ctx.fillStyle = '#9ed4e2';
+            ctx.fillRect(z5.x - z5.radius - 5, seaY, z5.radius * 2 + 10, 50);
+
+            const waveOffset = Math.sin(time * 0.0025) * 4;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+            ctx.lineWidth = 2.2;
+            ctx.beginPath();
+            ctx.moveTo(z5.x - 48, seaY + waveOffset);
+            ctx.bezierCurveTo(
+              z5.x - 20, seaY - 3 + waveOffset,
+              z5.x + 20, seaY + 4 + waveOffset,
+              z5.x + 48, seaY + waveOffset
+            );
+            ctx.stroke();
+            ctx.restore();
+
+            const pierX = z5.x - 14;
+            const pierY = z5.y - 12;
+            ctx.fillStyle = '#b08b68';
+            for (let p = 0; p < 4; p++) {
+              ctx.fillRect(pierX - 6, pierY + p * 6, 28, 4.5);
+            }
+            ctx.fillStyle = '#8f6a47';
+            ctx.fillRect(pierX - 5, pierY + 22, 4, 10);
+            ctx.fillRect(pierX + 17, pierY + 22, 4, 10);
+
+            ctx.fillStyle = '#f5b4b4';
+            ctx.beginPath();
+            ctx.arc(z5.x + 22, z5.y - 16, 3.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
+
+          function drawNature(ctx, time) {
+            const trees = [
+              { x: 75, y: 70, r: 24, c: '#93b195' },
+              { x: 125, y: 55, r: 20, c: '#f0cdcb' },
+              { x: 720, y: 75, r: 26, c: '#8aa88c' },
+              { x: 670, y: 55, r: 22, c: '#ebd8a7' },
+              { x: 65, y: 470, r: 25, c: '#8ea890' },
+              { x: 735, y: 475, r: 26, c: '#85a687' },
+              { x: 395, y: 55, r: 22, c: '#8aa68c' }
+            ];
+
+            trees.forEach(t => {
+              ctx.fillStyle = 'rgba(70, 90, 75, 0.12)';
+              ctx.beginPath();
+              ctx.ellipse(t.x, t.y + t.r * 0.7, t.r * 0.9, t.r * 0.35, 0, 0, Math.PI * 2);
+              ctx.fill();
+
+              ctx.fillStyle = '#6e5140';
+              ctx.fillRect(t.x - 3, t.y + 4, 6, t.r * 0.6);
+
+              ctx.fillStyle = t.c;
+              ctx.beginPath();
+              ctx.arc(t.x, t.y, t.r, 0, Math.PI * 2);
+              ctx.fill();
+
+              ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+              ctx.beginPath();
+              ctx.arc(t.x - t.r * 0.25, t.y - t.r * 0.25, t.r * 0.55, 0, Math.PI * 2);
+              ctx.fill();
+            });
+          }
+
+          function drawPlayer(ctx, px, py, dir = 'down', cycle = 0, isMoving = false) {
+            ctx.save();
+            ctx.translate(px, py);
+
+            const bob = isMoving ? Math.abs(Math.sin(cycle * 8)) * 1.8 : 0;
+            const stride = isMoving ? Math.sin(cycle * 8) * 4 : 0;
+
+            // Ombre douce sous les pieds
+            ctx.beginPath();
+            ctx.ellipse(0, 16, 11, 4.5, 0, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(50, 40, 32, 0.18)';
+            ctx.fill();
+
+            ctx.translate(0, -bob);
+
+            if (dir === 'down') {
+              // --- VUE DE FACE ---
+              // Cheveux longs marron foncé tombant derrière les épaules
+              ctx.beginPath();
+              ctx.roundRect(-8, -14, 16, 22, [6, 6, 8, 8]);
+              ctx.fillStyle = '#301d14';
+              ctx.fill();
+
+              // Jambes (peau dorée)
+              ctx.fillStyle = '#f8d5bb';
+              ctx.fillRect(-5, 5 + stride, 3.5, 8);
+              ctx.fillRect(1.5, 5 - stride, 3.5, 8);
+
+              // Baskets blanches avec semelle fine
+              ctx.fillStyle = '#ffffff';
+              ctx.beginPath();
+              ctx.roundRect(-6, 12 + stride, 4.5, 4.5, 2);
+              ctx.roundRect(1, 12 - stride, 4.5, 4.5, 2);
+              ctx.fill();
+              ctx.fillStyle = '#d5d5d5';
+              ctx.fillRect(-6, 15.5 + stride, 4.5, 1);
+              ctx.fillRect(1, 15.5 - stride, 4.5, 1);
+
+              // Short en jean bleu classique
+              ctx.fillStyle = '#48729c';
+              ctx.beginPath();
+              ctx.roundRect(-6, 0, 12, 7.5, [2, 2, 2, 2]);
+              ctx.fill();
+              ctx.fillStyle = '#395c80';
+              ctx.fillRect(-0.5, 4.5, 1, 3);
+
+              // Bras
+              ctx.fillStyle = '#f8d5bb';
+              ctx.fillRect(-8.5, -6, 2.5, 9);
+              ctx.fillRect(6, -6, 2.5, 9);
+
+              // Débardeur moulant vert d'eau / kaki clair
+              ctx.fillStyle = '#8caea0';
+              ctx.beginPath();
+              ctx.roundRect(-5.5, -8, 11, 10, [2, 2, 1, 1]);
+              ctx.fill();
+              ctx.beginPath();
+              ctx.arc(0, -8, 2.5, 0, Math.PI);
+              ctx.fillStyle = '#f8d5bb';
+              ctx.fill();
+
+              // Sac cabas marron (tote bag) à l'épaule
+              ctx.strokeStyle = '#6e4326';
+              ctx.lineWidth = 1.2;
+              ctx.beginPath();
+              ctx.moveTo(5, -8);
+              ctx.lineTo(8, -1);
+              ctx.stroke();
+              ctx.fillStyle = '#8f5b38';
+              ctx.beginPath();
+              ctx.roundRect(6, -1, 6.5, 8, 1.5);
+              ctx.fill();
+              ctx.fillStyle = '#7a4c2d';
+              ctx.fillRect(6, -1, 6.5, 1.5);
+
+              // Cou
+              ctx.fillStyle = '#f8d5bb';
+              ctx.fillRect(-2, -10, 4, 3);
+
+              // Visage
+              ctx.beginPath();
+              ctx.arc(0, -14, 5.5, 0, Math.PI * 2);
+              ctx.fillStyle = '#f8d5bb';
+              ctx.fill();
+
+              // Yeux et joues douces
+              ctx.fillStyle = '#301d14';
+              ctx.fillRect(-2.5, -14, 1.2, 1.4);
+              ctx.fillRect(1.3, -14, 1.2, 1.4);
+              ctx.fillStyle = 'rgba(235, 130, 120, 0.45)';
+              ctx.beginPath();
+              ctx.arc(-3.2, -12, 1.2, 0, Math.PI * 2);
+              ctx.arc(3.2, -12, 1.2, 0, Math.PI * 2);
+              ctx.fill();
+
+              // Mèches avant
+              ctx.fillStyle = '#301d14';
+              ctx.beginPath();
+              ctx.arc(-4.5, -16, 3, 0, Math.PI * 2);
+              ctx.arc(4.5, -16, 3, 0, Math.PI * 2);
+              ctx.fill();
+
+              // Bandana / foulard vert texturé sur la tête
+              ctx.fillStyle = '#4f8564';
+              ctx.beginPath();
+              ctx.roundRect(-6, -19.5, 12, 4.5, [3, 3, 1, 1]);
+              ctx.fill();
+              ctx.strokeStyle = '#3b674d';
+              ctx.lineWidth = 0.8;
+              ctx.beginPath();
+              ctx.moveTo(-5, -17.5);
+              ctx.lineTo(5, -17.5);
+              ctx.stroke();
+              ctx.fillStyle = '#3b674d';
+              ctx.beginPath();
+              ctx.arc(5.5, -17, 1.6, 0, Math.PI * 2);
+              ctx.fill();
+
+            } else if (dir === 'up') {
+              // --- VUE DE DOS ---
+              ctx.fillStyle = '#f8d5bb';
+              ctx.fillRect(-5, 5 - stride, 3.5, 8);
+              ctx.fillRect(1.5, 5 + stride, 3.5, 8);
+
+              ctx.fillStyle = '#ffffff';
+              ctx.beginPath();
+              ctx.roundRect(-6, 12 - stride, 4.5, 4.5, 2);
+              ctx.roundRect(1, 12 + stride, 4.5, 4.5, 2);
+              ctx.fill();
+
+              ctx.fillStyle = '#48729c';
+              ctx.beginPath();
+              ctx.roundRect(-6, 0, 12, 7.5, [2, 2, 2, 2]);
+              ctx.fill();
+              ctx.strokeStyle = '#395c80';
+              ctx.lineWidth = 0.8;
+              ctx.strokeRect(-4.5, 2, 3, 3);
+              ctx.strokeRect(1.5, 2, 3, 3);
+
+              ctx.fillStyle = '#8caea0';
+              ctx.beginPath();
+              ctx.roundRect(-5.5, -8, 11, 10, [2, 2, 1, 1]);
+              ctx.fill();
+
+              ctx.fillStyle = '#8f5b38';
+              ctx.beginPath();
+              ctx.roundRect(6, -1, 6.5, 8, 1.5);
+              ctx.fill();
+
+              // Cheveux longs tombant dans le dos
+              ctx.fillStyle = '#301d14';
+              ctx.beginPath();
+              ctx.moveTo(-6, -15);
+              ctx.quadraticCurveTo(-9, -2, -5, 4);
+              ctx.lineTo(5, 4);
+              ctx.quadraticCurveTo(9, -2, 6, -15);
+              ctx.closePath();
+              ctx.fill();
+
+              ctx.beginPath();
+              ctx.arc(0, -14, 5.5, 0, Math.PI * 2);
+              ctx.fillStyle = '#301d14';
+              ctx.fill();
+
+              ctx.fillStyle = '#4f8564';
+              ctx.beginPath();
+              ctx.roundRect(-6, -19.5, 12, 4.5, [3, 3, 1, 1]);
+              ctx.fill();
+              ctx.fillStyle = '#3b674d';
+              ctx.beginPath();
+              ctx.arc(0, -17, 1.8, 0, Math.PI * 2);
+              ctx.fill();
+
+            } else if (dir === 'right' || dir === 'left') {
+              // --- VUE DE PROFIL ---
+              if (dir === 'left') {
+                ctx.scale(-1, 1);
+              }
+
+              ctx.fillStyle = '#f8d5bb';
+              ctx.fillRect(-2 - stride, 5, 3.5, 8);
+              ctx.fillRect(-1 + stride, 5, 3.5, 8);
+
+              ctx.fillStyle = '#ffffff';
+              ctx.beginPath();
+              ctx.roundRect(-3 - stride, 12, 5.5, 4.5, 2);
+              ctx.roundRect(-2 + stride, 12, 5.5, 4.5, 2);
+              ctx.fill();
+
+              ctx.fillStyle = '#48729c';
+              ctx.beginPath();
+              ctx.roundRect(-4.5, 0, 9, 7.5, 2);
+              ctx.fill();
+
+              ctx.fillStyle = '#8caea0';
+              ctx.beginPath();
+              ctx.roundRect(-4, -8, 8, 10, [2, 2, 1, 1]);
+              ctx.fill();
+
+              ctx.fillStyle = '#8f5b38';
+              ctx.beginPath();
+              ctx.roundRect(-1, -1, 6, 8, 1.5);
+              ctx.fill();
+              ctx.strokeStyle = '#6e4326';
+              ctx.lineWidth = 1;
+              ctx.strokeRect(-1, -1, 6, 8);
+
+              ctx.fillStyle = '#f8d5bb';
+              ctx.fillRect(-1.5, -6, 2.5, 9);
+
+              ctx.beginPath();
+              ctx.arc(0, -14, 5.2, 0, Math.PI * 2);
+              ctx.fillStyle = '#f8d5bb';
+              ctx.fill();
+
+              ctx.fillStyle = '#301d14';
+              ctx.fillRect(2.2, -14, 1.2, 1.2);
+              ctx.fillStyle = 'rgba(235, 130, 120, 0.45)';
+              ctx.beginPath();
+              ctx.arc(2.5, -12, 1.1, 0, Math.PI * 2);
+              ctx.fill();
+
+              ctx.fillStyle = '#301d14';
+              ctx.beginPath();
+              ctx.moveTo(-2, -17);
+              ctx.quadraticCurveTo(-9, -8, -6, 4);
+              ctx.lineTo(-2, 4);
+              ctx.quadraticCurveTo(-4, -8, 1, -17);
+              ctx.closePath();
+              ctx.fill();
+
+              ctx.fillStyle = '#4f8564';
+              ctx.beginPath();
+              ctx.roundRect(-5, -19.5, 10, 4.5, [3, 3, 1, 1]);
+              ctx.fill();
+              ctx.fillStyle = '#3b674d';
+              ctx.beginPath();
+              ctx.arc(-5, -17, 1.8, 0, Math.PI * 2);
+              ctx.fill();
+            }
+
+            ctx.restore();
+          }
+
+          function drawInteractionPrompt(ctx, px, py, zone, time) {
+            ctx.save();
+            const promptY = py - 38 + Math.sin(time * 0.005) * 2;
+
+            const text = "Appuyez sur X pour inspecter";
+            ctx.font = '600 11.5px Plus Jakarta Sans, system-ui, sans-serif';
+            const textWidth = ctx.measureText(text).width;
+            const padX = 10;
+            const bubbleW = textWidth + padX * 2 + 18;
+            const bubbleH = 24;
+            const bx = px - bubbleW / 2;
+            const by = promptY - bubbleH;
+
+            ctx.shadowColor = 'rgba(60, 40, 30, 0.18)';
+            ctx.shadowBlur = 8;
+            ctx.shadowOffsetY = 3;
+
+            ctx.fillStyle = '#fffdfa';
+            ctx.beginPath();
+            ctx.roundRect(bx, by, bubbleW, bubbleH, 12);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(px - 5, by + bubbleH);
+            ctx.lineTo(px, by + bubbleH + 5);
+            ctx.lineTo(px + 5, by + bubbleH);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.shadowColor = 'transparent';
+            ctx.strokeStyle = zone.accessible ? '#dfa73b' : '#c8b49e';
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.roundRect(bx, by, bubbleW, bubbleH, 12);
+            ctx.stroke();
+
+            ctx.fillStyle = zone.accessible ? '#a8622b' : '#6f5a51';
+            ctx.font = '12px serif';
+            ctx.fillText(zone.icon, bx + 7, by + 16);
+
+            ctx.fillStyle = '#423129';
+            ctx.font = '600 11px Plus Jakarta Sans, system-ui, sans-serif';
+            ctx.fillText(text, bx + 25, by + 16);
+
+            ctx.restore();
+          }
+
+          function drawSpawnAura(ctx, px, py, factor) {
+            ctx.save();
+            const r = (1 - factor) * 45 + 12;
+            ctx.strokeStyle = `rgba(224, 182, 90, ${factor * 0.8})`;
+            ctx.lineWidth = 2.5 * factor;
+            ctx.beginPath();
+            ctx.arc(px, py, r, 0, Math.PI * 2);
+            ctx.stroke();
+
+            const count = 8;
+            for (let i = 0; i < count; i++) {
+              const a = (i / count) * Math.PI * 2 + factor * 2;
+              const sx = px + Math.cos(a) * r;
+              const sy = py + Math.sin(a) * r * 0.7;
+              ctx.fillStyle = `rgba(255, 230, 140, ${factor})`;
+              ctx.beginPath();
+              ctx.arc(sx, sy, 2 * factor, 0, Math.PI * 2);
+              ctx.fill();
+            }
+            ctx.restore();
+          }
+
+          function drawPetals(ctx) {
+            ctx.save();
+            petals.forEach(p => {
+              ctx.fillStyle = p.color;
+              ctx.globalAlpha = p.alpha;
+              ctx.beginPath();
+              ctx.ellipse(p.x, p.y, p.r, p.r * 0.55, p.phase, 0, Math.PI * 2);
+              ctx.fill();
+            });
+            ctx.restore();
+          }
+
+          return {
+            init,
+            start,
+            pause,
+            spawnPlayerNearZone1
+          };
+        })();
+        window.WorldEngine = WorldEngine;
 
         // ===================================================
         // ENVOL MAGIQUE DE PLUMES (ANIMATION CANVAS)
@@ -2766,7 +4671,7 @@
           featherAnimationId = requestAnimationFrame(render);
         }
 
-        // Clic sur "Merveilleux" : grand envol de plumes et retour automatique au Menu des Plumes
+        // Clic sur "Merveilleux" : grand envol de plumes et retour automatique au Monde
         function handleVictoryDismiss() {
           if (victoryModal) {
             victoryModal.style.transition = 'opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s ease';
@@ -2778,8 +4683,8 @@
           }
 
           launchFeatherStorm(() => {
-            navigateTo('hub');
-            showToast('🪶 La Plume d\'Or de la Littérature s\'est posée dans votre Cabinet des Songes !');
+            returnToWorldFromTrial();
+            showToast('🪶 La Plume d\'Or de la Littérature s\'est posée dans votre sacoche !');
           });
         }
 
@@ -2793,9 +4698,12 @@
           btnModalToHub.addEventListener('click', handleVictoryDismiss);
         }
 
-        document.getElementById('btn-view-epilogue').addEventListener('click', () => {
-          alert('Félicitations pour avoir réuni les 5 plumes de la Quête ! La carte du trésor au cœur de la France est désormais gravée dans vos songes.');
-        });
+        const btnViewEpilogue = document.getElementById('btn-view-epilogue');
+        if (btnViewEpilogue) {
+          btnViewEpilogue.addEventListener('click', () => {
+            alert('Félicitations pour avoir réuni les 5 plumes de la Quête ! La carte du trésor au cœur de la France est désormais gravée dans vos songes.');
+          });
+        }
 
         // ===================================================
         // JEU 1 : L'ÉNIGME LITTÉRAIRE (WORDLE RECAMIER)
@@ -3098,17 +5006,23 @@
           setTimeout(() => inputEl.focus(), 150);
         }
 
-        restartGameBtn.addEventListener('click', () => restartGame1(true));
+        if (restartGameBtn) {
+          restartGameBtn.addEventListener('click', () => restartGame1(true));
+        }
 
-        inputEl.addEventListener('input', (e) => {
-          currentInput = e.target.value;
-          renderCurrentRow();
-        });
+        if (inputEl) {
+          inputEl.addEventListener('input', (e) => {
+            currentInput = e.target.value;
+            renderCurrentRow();
+          });
+        }
 
-        formEl.addEventListener('submit', (e) => {
-          e.preventDefault();
-          submitGuess();
-        });
+        if (formEl) {
+          formEl.addEventListener('submit', (e) => {
+            e.preventDefault();
+            submitGuess();
+          });
+        }
 
         document.querySelectorAll('.key-btn[data-key]').forEach(btn => {
           btn.addEventListener('click', () => {
@@ -3116,22 +5030,28 @@
             const letter = btn.getAttribute('data-key');
             if (normalize(currentInput).length < WORD_LENGTH) {
               currentInput += letter;
-              inputEl.value = currentInput;
+              if (inputEl) inputEl.value = currentInput;
               renderCurrentRow();
             }
           });
         });
 
-        document.getElementById('key-backspace').addEventListener('click', () => {
-          if (state.game1.isWon || state.game1.isGameOver) return;
-          currentInput = currentInput.slice(0, -1);
-          inputEl.value = currentInput;
-          renderCurrentRow();
-        });
+        const keyBackspace = document.getElementById('key-backspace');
+        if (keyBackspace) {
+          keyBackspace.addEventListener('click', () => {
+            if (state.game1.isWon || state.game1.isGameOver) return;
+            currentInput = currentInput.slice(0, -1);
+            if (inputEl) inputEl.value = currentInput;
+            renderCurrentRow();
+          });
+        }
 
-        document.getElementById('key-enter').addEventListener('click', () => {
-          submitGuess();
-        });
+        const keyEnter = document.getElementById('key-enter');
+        if (keyEnter) {
+          keyEnter.addEventListener('click', () => {
+            submitGuess();
+          });
+        }
 
         // Clavier physique universel
         document.addEventListener('keydown', (e) => {
@@ -3145,13 +5065,13 @@
           } else if (e.key === 'Backspace') {
             e.preventDefault();
             currentInput = currentInput.slice(0, -1);
-            inputEl.value = currentInput;
+            if (inputEl) inputEl.value = currentInput;
             renderCurrentRow();
           } else if (/^[a-zA-ZàâäéèêëîïôöùûüçÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ]$/.test(e.key)) {
             e.preventDefault();
             if (normalize(currentInput).length < WORD_LENGTH) {
               currentInput += e.key.toUpperCase();
-              inputEl.value = currentInput;
+              if (inputEl) inputEl.value = currentInput;
               renderCurrentRow();
             }
           }
@@ -3163,12 +5083,16 @@
         function copyCoords() {
           if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(COORDINATES).then(() => {
-              copyToast.classList.add('visible');
-              setTimeout(() => copyToast.classList.remove('visible'), 2000);
+              if (copyToast) {
+                copyToast.classList.add('visible');
+                setTimeout(() => copyToast.classList.remove('visible'), 2000);
+              }
             });
           }
         }
-        coordsBox.addEventListener('click', copyCoords);
+        if (coordsBox) {
+          coordsBox.addEventListener('click', copyCoords);
+        }
 
         // ===================================================
         // JEU 2 : L'APOTHICAIRE
@@ -3179,14 +5103,18 @@
             const feedback = document.getElementById('game-2-feedback');
             if (choice === 'sauge') {
               btn.classList.add('selected-correct');
-              feedback.style.color = '#387845';
-              feedback.textContent = 'Victoire ! La Sauge purificatrice apaise les âmes.';
+              if (feedback) {
+                feedback.style.color = '#387845';
+                feedback.textContent = 'Victoire ! La Sauge purificatrice apaise les âmes.';
+              }
               setTimeout(() => {
                 grantFeather(2, 'Plume d\'Émeraude Sauvage', 'Tu as trouvé le remède purificateur de l\'Officine. La deuxième plume rejoint ton Cabinet !');
               }, 700);
             } else {
-              feedback.style.color = '#b83e3e';
-              feedback.textContent = 'Cette plante n\'apporte pas la sérénité requise. Relis attentivement le vers.';
+              if (feedback) {
+                feedback.style.color = '#b83e3e';
+                feedback.textContent = 'Cette plante n\'apporte pas la sérénité requise. Relis attentivement le vers.';
+              }
             }
           });
         });
@@ -3194,21 +5122,29 @@
         // ===================================================
         // JEU 3 : DOSTOÏEVSKI
         // ===================================================
-        document.getElementById('form-game-3').addEventListener('submit', (e) => {
-          e.preventDefault();
-          const val = normalize(document.getElementById('input-game-3').value);
-          const feedback = document.getElementById('game-3-feedback');
-          if (val === 'BEAUTE') {
-            feedback.style.color = '#387845';
-            feedback.textContent = '« La Beauté sauvera le monde. » Sublime réponse !';
-            setTimeout(() => {
-              grantFeather(3, 'Plume Pourpre des Songes', 'La plume lourde de Dostoïevski s\'illumine. La troisième plume est à toi !');
-            }, 700);
-          } else {
-            feedback.style.color = '#b83e3e';
-            feedback.textContent = 'Ce n\'est pas le mot de la prophétie. Pense à ce qui émerveille le regard (6 lettres).';
-          }
-        });
+        const formGame3 = document.getElementById('form-game-3');
+        if (formGame3) {
+          formGame3.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const inputVal = document.getElementById('input-game-3');
+            const val = inputVal ? normalize(inputVal.value) : '';
+            const feedback = document.getElementById('game-3-feedback');
+            if (val === 'BEAUTE') {
+              if (feedback) {
+                feedback.style.color = '#387845';
+                feedback.textContent = '« La Beauté sauvera le monde. » Sublime réponse !';
+              }
+              setTimeout(() => {
+                grantFeather(3, 'Plume Pourpre des Songes', 'La plume lourde de Dostoïevski s\'illumine. La troisième plume est à toi !');
+              }, 700);
+            } else {
+              if (feedback) {
+                feedback.style.color = '#b83e3e';
+                feedback.textContent = 'Ce n\'est pas le mot de la prophétie. Pense à ce qui émerveille le regard (6 lettres).';
+              }
+            }
+          });
+        }
 
         // ===================================================
         // JEU 4 : PETIT PRINCE
@@ -3219,14 +5155,18 @@
             const feedback = document.getElementById('game-4-feedback');
             if (choice === 'B612') {
               btn.classList.add('selected-correct');
-              feedback.style.color = '#387845';
-              feedback.textContent = 'L\'astéroïde B-612 ! Là où la rose fleurit chaque matin.';
+              if (feedback) {
+                feedback.style.color = '#387845';
+                feedback.textContent = 'L\'astéroïde B-612 ! Là où la rose fleurit chaque matin.';
+              }
               setTimeout(() => {
                 grantFeather(4, 'Plume Stellaire', 'Le rire de l\'enfant résonne dans les étoiles. La quatrième plume est acquise !');
               }, 700);
             } else {
-              feedback.style.color = '#b83e3e';
-              feedback.textContent = 'Ce n\'est pas l\'astre où vit la petite rose.';
+              if (feedback) {
+                feedback.style.color = '#b83e3e';
+                feedback.textContent = 'Ce n\'est pas l\'astre où vit la petite rose.';
+              }
             }
           });
         });
@@ -3234,21 +5174,29 @@
         // ===================================================
         // JEU 5 : LE CYGNE
         // ===================================================
-        document.getElementById('form-game-5').addEventListener('submit', (e) => {
-          e.preventDefault();
-          const val = normalize(document.getElementById('input-game-5').value);
-          const feedback = document.getElementById('game-5-feedback');
-          if (val === 'CYGNE') {
-            feedback.style.color = '#387845';
-            feedback.textContent = 'Le Cygne royal déploie ses ailes sur la grève.';
-            setTimeout(() => {
-              grantFeather(5, 'Plume d\'Argent des Eaux', 'Les eaux calmes s\'ouvrent. Tu possèdes maintenant les cinq plumes !');
-            }, 700);
-          } else {
-            feedback.style.color = '#b83e3e';
-            feedback.textContent = 'Ce n\'est pas l\'anagramme correct des lettres G-N-C-Y-E.';
-          }
-        });
+        const formGame5 = document.getElementById('form-game-5');
+        if (formGame5) {
+          formGame5.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const inputVal = document.getElementById('input-game-5');
+            const val = inputVal ? normalize(inputVal.value) : '';
+            const feedback = document.getElementById('game-5-feedback');
+            if (val === 'CYGNE') {
+              if (feedback) {
+                feedback.style.color = '#387845';
+                feedback.textContent = 'Le Cygne royal déploie ses ailes sur la grève.';
+              }
+              setTimeout(() => {
+                grantFeather(5, 'Plume d\'Argent des Eaux', 'Les eaux calmes s\'ouvrent. Tu possèdes maintenant les cinq plumes !');
+              }, 700);
+            } else {
+              if (feedback) {
+                feedback.style.color = '#b83e3e';
+                feedback.textContent = 'Ce n\'est pas l\'anagramme correct des lettres G-N-C-Y-E.';
+              }
+            }
+          });
+        }
 
         // ===================================================
         // DÉMARRAGE & RESTAURATION
@@ -3257,9 +5205,14 @@
         updateFeathersUI();
         initGrid();
 
-        // Si l'utilisateur avait une partie en cours, restaurer son écran (hub ou jeu), sinon enveloppe
+        if (window.WorldEngine && window.WorldEngine.init) {
+          window.WorldEngine.init();
+        }
+
+        // Si l'utilisateur avait une partie en cours, restaurer son écran (monde ou jeu), sinon enveloppe
         if (state.currentScreen && screens[state.currentScreen] && state.currentScreen !== 'enveloppe') {
-          navigateTo(state.currentScreen, false);
+          const screenToRestore = state.currentScreen === 'hub' ? 'monde' : state.currentScreen;
+          navigateTo(screenToRestore, false);
         } else {
           navigateTo('enveloppe', false);
         }
